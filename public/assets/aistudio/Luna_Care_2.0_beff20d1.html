@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LunaCare - Personal Period & Care Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* iOS-inspired frosted glass palette with light & dark mode support */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Noto Sans Sinhala', 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 12% 8%, rgba(251, 113, 133, 0.16), transparent 42%),
+                radial-gradient(circle at 88% 18%, rgba(244, 114, 182, 0.14), transparent 40%),
+                linear-gradient(180deg, #fff7f9 0%, #fdf2f6 52%, #f9eef3 100%);
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+            transition: background 0.28s ease, color 0.28s ease;
+        }
+
+        body.theme-dark {
+            background:
+                radial-gradient(circle at 14% 10%, rgba(244, 63, 94, 0.18), transparent 44%),
+                radial-gradient(circle at 86% 20%, rgba(236, 72, 153, 0.12), transparent 42%),
+                linear-gradient(180deg, #0b090e 0%, #110c14 55%, #09070c 100%);
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow:
+                0 10px 28px -10px rgba(190, 24, 93, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.18s ease;
+        }
+
+        body.theme-dark .glass-card {
+            background: rgba(28, 22, 30, 0.74);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.11);
+            box-shadow:
+                0 16px 36px -14px rgba(0, 0, 0, 0.72),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        body.theme-dark header {
+            background: rgba(18, 14, 21, 0.76) !important;
+            backdrop-filter: blur(24px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+            border-color: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        body.theme-dark nav > div {
+            background: rgba(20, 15, 24, 0.82) !important;
+            backdrop-filter: blur(26px) saturate(190%) !important;
+            -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        body.theme-dark .text-slate-800 { color: #f8fafc !important; }
+        body.theme-dark .text-slate-700 { color: #e2e8f0 !important; }
+        body.theme-dark .text-slate-600 { color: #cbd5e1 !important; }
+        body.theme-dark .text-slate-500 { color: #94a3b8 !important; }
+        body.theme-dark .bg-white,
+        body.theme-dark .bg-white\/80,
+        body.theme-dark .bg-white\/85,
+        body.theme-dark .bg-white\/90,
+        body.theme-dark .bg-white\/95 { background-color: rgba(38, 30, 42, 0.82) !important; }
+        body.theme-dark .bg-rose-50,
+        body.theme-dark .bg-rose-50\/50,
+        body.theme-dark .bg-rose-50\/60,
+        body.theme-dark .bg-rose-50\/70,
+        body.theme-dark .bg-rose-50\/80 { background-color: rgba(244, 63, 94, 0.14) !important; }
+        body.theme-dark .bg-pink-50\/60,
+        body.theme-dark .bg-pink-50\/70 { background-color: rgba(236, 72, 153, 0.14) !important; }
+        body.theme-dark .bg-sky-50,
+        body.theme-dark .bg-sky-50\/60,
+        body.theme-dark .bg-sky-50\/70 { background-color: rgba(14, 165, 233, 0.14) !important; }
+        body.theme-dark .bg-slate-100 { background-color: rgba(71, 85, 105, 0.36) !important; }
+        body.theme-dark .border-rose-100,
+        body.theme-dark .border-rose-100\/80,
+        body.theme-dark .border-rose-200 { border-color: rgba(255, 255, 255, 0.11) !important; }
+        body.theme-dark .border-pink-100,
+        body.theme-dark .border-pink-200,
+        body.theme-dark .border-pink-200\/80 { border-color: rgba(255, 255, 255, 0.11) !important; }
+        body.theme-dark .border-sky-100,
+        body.theme-dark .border-sky-200,
+        body.theme-dark .border-sky-200\/80 { border-color: rgba(56, 189, 248, 0.24) !important; }
+        body.theme-dark input,
+        body.theme-dark textarea {
+            color: #f8fafc !important;
+        }
+        body.theme-dark input::placeholder,
+        body.theme-dark textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .ios-press {
+            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease;
+        }
+        .ios-press:active {
+            transform: scale(0.96);
+        }
+
+        .pin-dot {
+            transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .pin-dot.filled {
+            background-color: #f43f5e;
+            transform: scale(1.22);
+            box-shadow: 0 0 12px rgba(244, 63, 94, 0.45);
+        }
+
+        .chip-active {
+            background: linear-gradient(135deg, #f43f5e, #ec4899) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 6px 14px -4px rgba(244, 63, 94, 0.45);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Translucent floating flower petals background */
+        #petal-bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .petal-item {
+            position: absolute;
+            top: -12%;
+            opacity: 0;
+            will-change: transform, opacity;
+            filter: blur(0.2px);
+            animation: petalFall linear infinite;
+        }
+
+        body.theme-dark .petal-item {
+            filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.22));
+        }
+
+        @keyframes petalFall {
+            0% {
+                transform: translate3d(0, -10vh, 0) rotate(0deg) scale(0.9);
+                opacity: 0;
+            }
+            12% {
+                opacity: var(--petal-opacity, 0.34);
+            }
+            50% {
+                transform: translate3d(var(--petal-drift, 28px), 48vh, 0) rotate(180deg) scale(1);
+                opacity: var(--petal-opacity, 0.34);
+            }
+            88% {
+                opacity: calc(var(--petal-opacity, 0.34) * 0.7);
+            }
+            100% {
+                transform: translate3d(calc(var(--petal-drift, 28px) * -0.5), 106vh, 0) rotate(360deg) scale(0.92);
+                opacity: 0;
+            }
+        }
+
+        #screen-setup,
+        #screen-lock,
+        #screen-app {
+            position: relative;
+            z-index: 10;
+        }
+
+        #toast {
+            position: fixed;
+            z-index: 100;
+        }
+
+        #install-modal {
+            position: fixed;
+            z-index: 90;
+        }
+    </style>
+</head>
+<body class="text-slate-800 selection:bg-rose-500 selection:text-white">
+    <!-- Translucent Floating Flowers Background Layer -->
+    <div id="petal-bg-layer" aria-hidden="true"></div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] pointer-events-none opacity-0 transition-all duration-300 -translate-y-3 w-[90%] max-w-sm">
+        <div class="bg-white/95 backdrop-blur-md border border-rose-200 text-slate-800 px-4 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2.5 text-sm font-medium text-center">
+            <span id="toast-icon" class="text-lg">🌸</span>
+            <span id="toast-msg">සාර්ථකව සුරකින ලදී</span>
+        </div>
+    </div>
+
+    <!-- Add to Home Screen Modal -->
+    <div id="install-modal" class="fixed inset-0 z-[90] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md rounded-3xl p-6 relative animate-fade-in">
+            <button id="btn-close-install-modal" type="button" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">✕</button>
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 text-white flex items-center justify-center text-xl shadow-md">📱</div>
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-800">Home Screen එකට එක් කරන්න</h3>
+                    <p class="text-xs text-slate-500">දුරකථනයේ App එකක් ලෙස පහසුවෙන් විවෘත කරන්න</p>
+                </div>
+            </div>
+
+            <div id="pwa-direct-install-box" class="hidden mb-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200">
+                <p class="text-xs text-rose-800 font-semibold mb-2">ඔබගේ Browser එක Direct Install සඳහා සහාය දක්වයි:</p>
+                <button id="btn-trigger-pwa-install" type="button" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
+                    ⬇️ දැන්ම Home Screen එකට Install කරන්න
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                <div class="p-3 rounded-2xl bg-rose-50/70 border border-rose-100">
+                    <p class="font-bold text-rose-600 mb-1">🤖 Android (Google Chrome)</p>
+                    <p>1. ඉහළ දකුණු කෙළවරේ ඇති <b>⋮ (Menu)</b> බටන් එක ඔබන්න.<br>2. <b>"Add to Home screen"</b> හෝ <b>"Install app"</b> තෝරා <b>Add</b> කරන්න.</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-pink-50/70 border border-pink-100">
+                    <p class="font-bold text-pink-600 mb-1">🍎 iPhone / iPad (Safari)</p>
+                    <p>1. පහළ ඇති <b>Share (□↑)</b> icon එක ඔබන්න.<br>2. පහළට Scroll කර <b>"Add to Home Screen"</b> තෝරන්න.</p>
+                </div>
+            </div>
+
+            <button id="btn-got-it-install" type="button" class="w-full mt-4 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl text-xs transition">
+                තේරුණා 🌸
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. FIRST-TIME SETUP SCREEN -->
+    <section id="screen-setup" class="min-h-screen flex flex-col justify-center items-center p-5 hidden">
+        <div class="w-full max-w-md glass-card rounded-3xl p-6 sm:p-7 animate-fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-rose-500 to-pink-400 flex items-center justify-center text-3xl shadow-lg shadow-rose-500/25 mb-3 text-white">
+                    🌸
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">Luna<span class="text-rose-500">Care</span></h1>
+                <p class="text-slate-500 text-xs mt-1">පෞද්ගලික සෞඛ්‍ය, ජල පාන සහ ඔසප් චක්‍ර සටහන් පොත</p>
+            </div>
+
+            <form id="setup-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">ඔබගේ නම</label>
+                    <input type="text" id="setup-name" required placeholder="ඔබගේ නම ඇතුළත් කරන්න"
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">ආරක්ෂිත PIN අංකයක් සාදන්න (ඉලක්කම් 4ක්)</label>
+                    <input type="password" id="setup-pin" inputmode="numeric" pattern="\d{4}" maxlength="4" required placeholder="••••"
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 tracking-[0.5em] text-center font-bold placeholder-slate-400 focus:outline-none focus:border-rose-500 transition">
+                    <p class="text-[11px] text-slate-400 mt-1">App එක විවෘත කරන සෑම විටම මෙම PIN අංකය අවශ්‍ය වේ.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Report යවන WhatsApp අංකය</label>
+                        <input type="tel" id="setup-whatsapp" placeholder="947XXXXXXXX"
+                            class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Report යවන Email ලිපිනය</label>
+                        <input type="email" id="setup-email" placeholder="name@example.com"
+                            class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">අවසන් වරට ඔසප් වීම ආරම්භ වූ දිනය</label>
+                    <input type="date" id="setup-last-period" required
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-rose-500 transition">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">චක්‍ර කාලය (දින)</label>
+                        <input type="number" id="setup-cycle-len" value="28" min="20" max="45" required
+                            class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-2 py-2.5 text-sm text-slate-800 text-center focus:outline-none focus:border-rose-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">ඔසප් දින ගණන</label>
+                        <input type="number" id="setup-period-len" value="5" min="2" max="10" required
+                            class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-2 py-2.5 text-sm text-slate-800 text-center focus:outline-none focus:border-rose-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">ජල ඉලක්කය (ml)</label>
+                        <input type="number" id="setup-water-goal" value="2000" step="100" min="500" max="5000" required
+                            class="w-full bg-sky-50/60 border border-sky-200 rounded-xl px-2 py-2.5 text-sm text-slate-800 text-center focus:outline-none focus:border-sky-500 transition">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full mt-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-rose-500/25 active:scale-[0.98] transition text-sm">
+                    ආරම්භ කරන්න ✨
+                </button>
+            </form>
+
+            <div class="mt-4 pt-4 border-t border-rose-100 text-center">
+                <label class="inline-flex items-center gap-2 text-xs text-rose-600 hover:text-rose-700 cursor-pointer font-semibold">
+                    <span>📂 කලින් ගත් Backup (JSON) ගොනුවක් ඇත්නම් Import කරන්න</span>
+                    <input type="file" id="setup-import-file" accept=".json" class="hidden">
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PIN LOCK SCREEN -->
+    <section id="screen-lock" class="min-h-screen flex flex-col justify-center items-center p-5 hidden">
+        <div class="w-full max-w-xs text-center animate-fade-in">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-white border border-rose-200 flex items-center justify-center text-2xl mb-3 shadow-md">
+                🔒
+            </div>
+            <h2 id="lock-greeting" class="text-lg font-bold text-slate-800">ආයුබෝවන්!</h2>
+            <p class="text-xs text-slate-500 mt-1 mb-6">ඇතුළු වීමට ඉලක්කම් 4ක PIN අංකය ඇතුළත් කරන්න</p>
+
+            <div id="pin-dots" class="flex justify-center gap-4 mb-7">
+                <span class="pin-dot w-3.5 h-3.5 rounded-full bg-rose-200 border border-rose-300"></span>
+                <span class="pin-dot w-3.5 h-3.5 rounded-full bg-rose-200 border border-rose-300"></span>
+                <span class="pin-dot w-3.5 h-3.5 rounded-full bg-rose-200 border border-rose-300"></span>
+                <span class="pin-dot w-3.5 h-3.5 rounded-full bg-rose-200 border border-rose-300"></span>
+            </div>
+
+            <p id="pin-error" class="text-xs text-rose-600 font-semibold h-4 mb-3"></p>
+
+            <div class="grid grid-cols-3 gap-3 max-w-[260px] mx-auto">
+                <button type="button" data-num="1" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">1</button>
+                <button type="button" data-num="2" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">2</button>
+                <button type="button" data-num="3" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">3</button>
+                <button type="button" data-num="4" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">4</button>
+                <button type="button" data-num="5" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">5</button>
+                <button type="button" data-num="6" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">6</button>
+                <button type="button" data-num="7" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">7</button>
+                <button type="button" data-num="8" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">8</button>
+                <button type="button" data-num="9" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">9</button>
+                <button type="button" id="pin-reset-trigger" class="h-14 rounded-2xl bg-rose-50/70 hover:bg-rose-100 text-[11px] font-semibold text-rose-600 transition">Reset</button>
+                <button type="button" data-num="0" class="pin-key h-14 rounded-2xl bg-white hover:bg-rose-50 active:bg-rose-100 border border-rose-100 text-xl font-bold text-slate-800 shadow-sm transition">0</button>
+                <button type="button" id="pin-backspace" class="h-14 rounded-2xl bg-rose-50/70 hover:bg-rose-100 active:bg-rose-200 text-lg font-bold text-slate-700 transition">⌫</button>
+            </div>
+
+            <div id="pin-recovery-box" class="mt-5 hidden glass-card p-3.5 rounded-2xl text-xs text-slate-600">
+                <p class="mb-2">PIN අමතක වුණාද? Default PIN (<b class="text-rose-600">1234</b>) බවට Reset කරන්න:</p>
+                <div class="flex gap-2 justify-center">
+                    <button id="btn-emergency-pin-reset" type="button" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl font-semibold">PIN -> 1234</button>
+                    <button id="btn-close-recovery" type="button" class="bg-rose-50 text-slate-700 px-3 py-1.5 rounded-xl font-semibold">අවලංගු කරන්න</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. MAIN APP SHELL -->
+    <div id="screen-app" class="min-h-screen pb-24 hidden">
+        <!-- Top Header -->
+        <header class="sticky top-0 z-30 bg-white/75 backdrop-blur-xl border-b border-rose-100/80 px-4 py-3">
+            <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 shrink-0 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center text-lg shadow-sm shadow-rose-500/25 text-white">
+                        🌸
+                    </div>
+                    <div class="truncate">
+                        <h1 class="text-[15px] font-extrabold leading-tight text-slate-800 tracking-tight">Luna<span class="text-rose-500">Care</span></h1>
+                        <p id="header-date-sub" class="text-[11px] font-medium text-slate-500 truncate"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 bg-rose-50/80 p-1 rounded-2xl border border-rose-100">
+                    <button id="btn-toggle-theme" type="button" title="Light / Dark Mode"
+                        class="ios-press px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[11px] font-bold text-rose-600 transition flex items-center gap-1">
+                        <span id="theme-toggle-icon">🌙</span>
+                        <span id="theme-toggle-label" class="hidden sm:inline">Dark</span>
+                    </button>
+                    <button id="btn-open-install-guide" type="button" title="Add to Home Screen"
+                        class="ios-press px-2.5 py-1.5 rounded-xl hover:bg-white/80 text-[11px] font-bold text-rose-600 transition flex items-center gap-1">
+                        <span>📱</span>
+                        <span>Home</span>
+                    </button>
+                    <button id="btn-lock-app" type="button" title="App Lock"
+                        class="ios-press px-2.5 py-1.5 rounded-xl hover:bg-white/80 text-xs font-semibold text-slate-700 transition flex items-center gap-1">
+                        <span>🔒</span>
+                        <span class="hidden sm:inline">Lock</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="view-dashboard" class="space-y-4 animate-fade-in">
+                <!-- Hero Cycle Prediction Card -->
+                <div class="glass-card rounded-3xl p-5 relative overflow-hidden">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <span id="hero-phase-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-600 mb-2">
+                                ✨ සූදානම් වෙමින්
+                            </span>
+                            <h2 id="hero-main-title" class="text-xl sm:text-2xl font-extrabold text-slate-800 leading-snug"></h2>
+                            <p id="hero-sub-desc" class="text-xs text-slate-500 mt-1"></p>
+                        </div>
+                        <div class="text-right shrink-0 bg-rose-50 border border-rose-100 px-3 py-2 rounded-2xl">
+                            <div class="text-[10px] uppercase tracking-wider text-rose-500 font-bold">චක්‍ර දිනය</div>
+                            <div id="hero-cycle-day" class="text-xl font-extrabold text-rose-600">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="mt-4 pt-4 border-t border-rose-100 grid grid-cols-2 gap-2.5">
+                        <button id="btn-quick-period-start" type="button"
+                            class="bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>🩸</span>
+                            <span>අද Period හැදුණා</span>
+                        </button>
+                        <button id="btn-quick-log-today" type="button"
+                            class="bg-rose-50 hover:bg-rose-100 active:scale-[0.98] text-rose-700 border border-rose-200 font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5">
+                            <span>✍️</span>
+                            <span>අද සටහන් / රෝග</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 100ml Water Drink Level Meter Card -->
+                <div class="glass-card rounded-3xl p-4 border-sky-200/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-base">💧</span>
+                            <div>
+                                <h3 class="text-xs font-extrabold text-slate-800">Water Drink Meter (100ml කොටස්)</h3>
+                                <p id="dash-water-status-text" class="text-[11px] text-slate-500">අද ජල ඉලක්කය සම්පූර්ණ කරන්න</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span id="dash-water-amount" class="text-sm font-extrabold text-sky-600">0 ml</span>
+                            <span id="dash-water-goal-label" class="text-[11px] text-slate-400 block">/ 2000 ml</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-3 rounded-full bg-sky-100 overflow-hidden mb-3">
+                        <div id="dash-water-bar" class="h-full bg-gradient-to-r from-sky-400 to-cyan-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button type="button" data-water-delta="-100" class="water-btn py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95">-100ml</button>
+                        <button type="button" data-water-delta="100" class="water-btn py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs transition shadow-sm active:scale-95">+100ml</button>
+                        <button type="button" data-water-delta="250" class="water-btn py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs transition active:scale-95">+250ml</button>
+                        <button type="button" data-water-delta="500" class="water-btn py-2 rounded-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-700 font-bold text-xs transition active:scale-95">+500ml</button>
+                    </div>
+                </div>
+
+                <!-- Key Predictions Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="text-xs text-rose-500 font-semibold mb-1">🗓️ මීළඟ ඔසප් දිනය</div>
+                        <div id="stat-next-period" class="text-base font-extrabold text-slate-800">-</div>
+                        <div id="stat-next-period-countdown" class="text-[11px] text-slate-500 mt-0.5">-</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="text-xs text-pink-500 font-semibold mb-1">🥚 ඩිම්බ මෝචනය (Ovulation)</div>
+                        <div id="stat-ovulation" class="text-base font-extrabold text-slate-800">-</div>
+                        <div id="stat-fertile-window" class="text-[11px] text-slate-500 mt-0.5">-</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="text-xs text-rose-600 font-semibold mb-1">🔄 සාමාන්‍ය චක්‍රය</div>
+                        <div id="stat-avg-cycle" class="text-base font-extrabold text-slate-800">-</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Lifetime Calendar යාවත්කාලීනයි</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="text-xs text-pink-600 font-semibold mb-1">🩺 අද සෞඛ්‍ය / වේදනාව</div>
+                        <div id="stat-today-health" class="text-sm font-extrabold text-slate-800 truncate">සටහන් නැත</div>
+                        <div id="stat-today-flow" class="text-[11px] text-slate-500 mt-0.5 truncate">-</div>
+                    </div>
+                </div>
+
+                <!-- Care Note Card -->
+                <div class="glass-card rounded-3xl p-4 border-pink-200">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-base">💌</span>
+                        <span class="text-xs font-bold text-rose-600">දෛනික Care පණිවිඩය</span>
+                    </div>
+                    <p id="dash-care-note" class="text-sm text-slate-700 leading-relaxed"></p>
+                </div>
+
+                <!-- Quick WhatsApp / Email Summary Card -->
+                <div class="glass-card rounded-3xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h3 class="text-xs font-extrabold text-slate-800">📲 දෛනික සාරාංශය යවන්න</h3>
+                            <p class="text-[11px] text-slate-500">Water + Period + රෝග ලක්ෂණ Summary එක WhatsApp / Email වෙත</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 mt-2">
+                        <button id="dash-btn-whatsapp" type="button"
+                            class="bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>💬</span>
+                            <span>WhatsApp යවන්න</span>
+                        </button>
+                        <button id="dash-btn-email" type="button"
+                            class="bg-rose-50 hover:bg-rose-100 active:scale-[0.98] text-rose-700 border border-rose-200 font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5">
+                            <span>✉️</span>
+                            <span>Email යවන්න</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: LIFETIME CALENDAR -->
+            <section id="view-calendar" class="space-y-4 hidden animate-fade-in">
+                <div class="glass-card rounded-3xl p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <button id="cal-prev-month" type="button" class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold flex items-center justify-center transition">‹</button>
+                        <div class="text-center">
+                            <h2 id="cal-month-title" class="text-base font-extrabold text-slate-800"></h2>
+                            <button id="cal-today-btn" type="button" class="text-[11px] text-rose-600 font-semibold hover:underline">අද මාසයට යන්න</button>
+                        </div>
+                        <button id="cal-next-month" type="button" class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold flex items-center justify-center transition">›</button>
+                    </div>
+
+                    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 mb-2">
+                        <div>ඉරි</div>
+                        <div>සඳු</div>
+                        <div>අඟ</div>
+                        <div>බදා</div>
+                        <div>බ්‍රහ</div>
+                        <div>සිකු</div>
+                        <div>සෙන</div>
+                    </div>
+
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 text-center"></div>
+
+                    <div class="mt-4 pt-3 border-t border-rose-100 flex flex-wrap gap-3 text-[11px] text-slate-600 justify-center">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> සටහන් කළ Period</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-200 border border-rose-400 inline-block"></span> අනුමාන Period</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pink-400 inline-block"></span> Ovulation</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-400 inline-block"></span> Water/Health Log</span>
+                    </div>
+                </div>
+
+                <div id="cal-selected-detail" class="glass-card rounded-3xl p-4">
+                    <p class="text-xs text-slate-500 text-center">විස්තර බැලීමට හෝ සටහන් කිරීමට දින දර්ශනයෙන් දිනයක් තෝරන්න.</p>
+                </div>
+            </section>
+
+            <!-- TAB 3: DAILY LOGGER (PERIOD + WATER 100ml + GENERAL HEALTH) -->
+            <section id="view-logger" class="space-y-4 hidden animate-fade-in">
+                <div class="glass-card rounded-3xl p-5 space-y-5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-extrabold text-slate-800">දෛනික සටහන් & රෝග ලක්ෂණ</h2>
+                            <p class="text-xs text-slate-500">අනුමාන දිනට කලින් හෝ පසුව ඕනෑම දිනයක් සටහන් කළ හැක</p>
+                        </div>
+                        <input type="date" id="log-date-input"
+                            class="bg-rose-50 border border-rose-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-rose-500">
+                    </div>
+
+                    <!-- Period Toggle + Cycle Start -->
+                    <div class="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 space-y-3">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <span>🩸</span>
+                                <span>මෙදින ඔසප් වීම සිදුවේ (Period Day)</span>
+                            </span>
+                            <input type="checkbox" id="log-is-period" class="w-5 h-5 accent-rose-500 rounded cursor-pointer">
+                        </label>
+                        <button id="btn-mark-cycle-start" type="button"
+                            class="w-full py-2 px-3 rounded-xl bg-white hover:bg-rose-100 border border-rose-200 text-xs font-bold text-rose-600 transition">
+                            ✨ මෙම දිනය නව ඔසප් චක්‍රයේ ආරම්භය ලෙස සලකුණු කරන්න
+                        </button>
+                    </div>
+
+                    <!-- 100ml Water Meter for Selected Date -->
+                    <div class="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-100 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-sky-800">💧 ජල පාන ප්‍රමාණය (100ml කොටස්)</span>
+                            <span id="log-water-display" class="text-sm font-extrabold text-sky-600">0 ml</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button type="button" data-log-water="-100" class="log-water-btn py-2 rounded-xl bg-white hover:bg-slate-100 border border-sky-200 text-slate-700 font-bold text-xs">-100ml</button>
+                            <button type="button" data-log-water="100" class="log-water-btn py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs">+100ml</button>
+                            <button type="button" data-log-water="250" class="log-water-btn py-2 rounded-xl bg-white hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs">+250ml</button>
+                            <button type="button" data-log-water="500" class="log-water-btn py-2 rounded-xl bg-white hover:bg-sky-100 border border-sky-200 text-cyan-700 font-bold text-xs">+500ml</button>
+                        </div>
+                    </div>
+
+                    <!-- Blood Flow Level -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">රුධිර වහන මට්ටම (Blood Flow)</label>
+                        <div id="flow-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <button type="button" data-flow="නැත (None)" class="flow-chip py-2 px-3 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-semibold text-slate-700 transition">නැත (None)</button>
+                            <button type="button" data-flow="බිංදු කිහිපයක් (Spotting)" class="flow-chip py-2 px-3 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-semibold text-slate-700 transition">Spotting</button>
+                            <button type="button" data-flow="අඩුයි (Light)" class="flow-chip py-2 px-3 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-semibold text-slate-700 transition">අඩුයි (Light)</button>
+                            <button type="button" data-flow="සාමාන්‍යයි (Medium)" class="flow-chip py-2 px-3 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-semibold text-slate-700 transition">සාමාන්‍යයි</button>
+                            <button type="button" data-flow="වැඩියි (Heavy)" class="flow-chip py-2 px-3 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-semibold text-slate-700 transition">වැඩියි (Heavy)</button>
+                        </div>
+                    </div>
+
+                    <!-- Pain Level (0-5) -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold text-slate-700">වේදනා මට්ටම (Pain Level 0–5)</label>
+                            <span id="pain-label-text" class="text-xs font-bold text-rose-600">0 - වේදනාවක් නැත</span>
+                        </div>
+                        <div id="pain-options" class="grid grid-cols-6 gap-1.5">
+                            <button type="button" data-pain="0" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">0 😊<br><span class="text-[10px]">නැත</span></button>
+                            <button type="button" data-pain="1" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">1 🙂<br><span class="text-[10px]">සුළු</span></button>
+                            <button type="button" data-pain="2" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">2 😐<br><span class="text-[10px]">මද</span></button>
+                            <button type="button" data-pain="3" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">3 😣<br><span class="text-[10px]">සැලකිය</span></button>
+                            <button type="button" data-pain="4" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">4 😭<br><span class="text-[10px]">තදබල</span></button>
+                            <button type="button" data-pain="5" class="pain-chip py-2.5 rounded-xl bg-rose-50/60 border border-rose-200 text-xs font-bold text-slate-700">5 🤒<br><span class="text-[10px]">ඉතා තද</span></button>
+                        </div>
+                    </div>
+
+                    <!-- General Health / Illness Symptoms -->
+                    <div class="p-3.5 rounded-2xl bg-pink-50/60 border border-pink-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-extrabold text-slate-800">🩺 සාමාන්‍ය රෝග ලක්ෂණ (General Health)</label>
+                            <span class="text-[10px] text-rose-600 font-semibold">Pattern Check</span>
+                        </div>
+                        <div id="general-symptom-options" class="flex flex-wrap gap-2">
+                            <button type="button" data-group="genSymptoms" data-val="හිසරදය (Headache)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">🤕 හිසරදය</button>
+                            <button type="button" data-group="genSymptoms" data-val="උණ / සෙම්ප්‍රතිශ්‍යාව (Fever/Cold)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">🤧 උණ/සෙම</button>
+                            <button type="button" data-group="genSymptoms" data-val="බඩේ අමාරුව / ගැස්ට්‍රයිටිස් (Stomach)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">🤢 බඩේ අමාරුව</button>
+                            <button type="button" data-group="genSymptoms" data-val="ඇඟේ මහන්සිය (Fatigue)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">😴 මහන්සිය</button>
+                            <button type="button" data-group="genSymptoms" data-val="කරකැවිල්ල (Dizziness)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">💫 කරකැවිල්ල</button>
+                            <button type="button" data-group="genSymptoms" data-val="උගුරේ අමාරුව (Sore Throat)" class="multi-chip px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-semibold text-slate-700">🗣️ උගුරේ අමාරුව</button>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">රෝග ලක්ෂණ තීව්‍රතාව (Severity 0–5)</label>
+                            <div id="gen-severity-options" class="grid grid-cols-6 gap-1.5">
+                                <button type="button" data-sev="0" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">0</button>
+                                <button type="button" data-sev="1" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">1</button>
+                                <button type="button" data-sev="2" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">2</button>
+                                <button type="button" data-sev="3" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">3</button>
+                                <button type="button" data-sev="4" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">4</button>
+                                <button type="button" data-sev="5" class="sev-chip py-1.5 rounded-lg bg-white border border-pink-200 text-xs font-bold text-slate-700">5</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Moods -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">මනෝභාවය (Moods)</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" data-group="moods" data-val="සතුටින් 😊" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">සතුටින් 😊</button>
+                            <button type="button" data-group="moods" data-val="ආදරණීය 🥰" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">ආදරණීය 🥰</button>
+                            <button type="button" data-group="moods" data-val="සන්සුන් 😌" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">සන්සුන් 😌</button>
+                            <button type="button" data-group="moods" data-val="තරහින් / Irritated 😤" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">තරහින් 😤</button>
+                            <button type="button" data-group="moods" data-val="දුකෙන් / Sensitive 🥺" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">දුකෙන් 🥺</button>
+                            <button type="button" data-group="moods" data-val="වෙහෙසට පත්ව 🥱" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">වෙහෙසට 🥱</button>
+                        </div>
+                    </div>
+
+                    <!-- Period Symptoms -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">ඔසප් රෝග ලක්ෂණ (Cycle Symptoms)</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" data-group="symptoms" data-val="බඩේ කැක්කුම (Cramps)" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">බඩේ කැක්කුම</button>
+                            <button type="button" data-group="symptoms" data-val="කොන්දේ කැක්කුම (Backache)" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">කොන්දේ කැක්කුම</button>
+                            <button type="button" data-group="symptoms" data-val="පියයුරු සංවේදීතාව" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">පියයුරු සංවේදීතාව</button>
+                            <button type="button" data-group="symptoms" data-val="Bloating" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">Bloating</button>
+                        </div>
+                    </div>
+
+                    <!-- Cravings -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">කෑමට ආසා දේවල් (Cravings)</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" data-group="cravings" data-val="චොකලට් 🍫" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">චොකලට් 🍫</button>
+                            <button type="button" data-group="cravings" data-val="අයිස්ක්‍රීම් 🍨" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">අයිස්ක්‍රීම් 🍨</button>
+                            <button type="button" data-group="cravings" data-val="උණුසුම් බීම ☕" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">උණුසුම් බීම ☕</button>
+                            <button type="button" data-group="cravings" data-val="පලතුරු / Snacks 🍓" class="multi-chip px-3 py-1.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-semibold text-slate-700">Snacks 🍓</button>
+                        </div>
+                    </div>
+
+                    <!-- Note -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">පුද්ගලික සටහනක් (Note)</label>
+                        <textarea id="log-note" rows="2" placeholder="අද දවස ගැන පොඩි සටහනක්..."
+                            class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500"></textarea>
+                    </div>
+
+                    <!-- Save & Share Buttons -->
+                    <div class="space-y-2 pt-1">
+                        <button id="btn-save-log" type="button"
+                            class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-[0.98] transition text-sm">
+                            සටහන සුරකින්න (Save Log) 💾
+                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="log-btn-whatsapp" type="button"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5">
+                                <span>💬</span>
+                                <span>Save & WhatsApp</span>
+                            </button>
+                            <button id="log-btn-email" type="button"
+                                class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2.5 px-3 rounded-2xl text-xs transition flex items-center justify-center gap-1.5">
+                                <span>✉️</span>
+                                <span>Save & Email</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: AI HEALTH ASSISTANT -->
+            <section id="view-assistant" class="space-y-4 hidden animate-fade-in">
+                <div class="glass-card rounded-3xl p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 text-white flex items-center justify-center text-lg shadow-sm">
+                                🤖
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-800">AI Health Assistant</h2>
+                                <p id="ai-mode-badge" class="text-[11px] text-rose-600 font-semibold">Smart Care Mode (Offline Ready)</p>
+                            </div>
+                        </div>
+                        <span id="ai-context-pill" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700">
+                            Context Synced
+                        </span>
+                    </div>
+
+                    <div id="ai-red-flag-banner" class="hidden p-3 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs leading-relaxed">
+                        <b>⚠️ වෛද්‍ය උපදෙස් සිහිකැඳවීම:</b> තදබල වේදනාවක් (4–5), උණ, කරකැවිල්ල හෝ දින කිහිපයක් පවතින අසනීපයක් ඇත්නම් කරුණාකර සුදුසුකම් ලත් වෛද්‍යවරයෙකු හමුවන්න. මෙය තොරතුරු සඳහා පමණි.
+                    </div>
+
+                    <!-- Quick Prompt Chips -->
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        <button type="button" data-ai-prompt="අද මගේ water intake, period phase සහ රෝග ලක්ෂණ අනුව care report එකක් දෙන්න" class="ai-quick-chip shrink-0 px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-[11px] font-semibold text-rose-700 transition">
+                            🩺 අද Health Check
+                        </button>
+                        <button type="button" data-ai-prompt="මගේ water intake මට්ටම හොඳද? තව කොපමණ වතුර බොන්න ඕනද?" class="ai-quick-chip shrink-0 px-3 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 border border-sky-200 text-[11px] font-semibold text-sky-700 transition">
+                            💧 Water Check
+                        </button>
+                        <button type="button" data-ai-prompt="Period cramps සහ mood swings අඩු කරගන්න සරල care tips දෙන්න" class="ai-quick-chip shrink-0 px-3 py-1.5 rounded-full bg-pink-50 hover:bg-pink-100 border border-pink-200 text-[11px] font-semibold text-pink-700 transition">
+                            🌸 Cycle Care Tips
+                        </button>
+                    </div>
+
+                    <!-- Chat Thread -->
+                    <div id="ai-chat-messages" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+
+                    <!-- Chat Form -->
+                    <form id="ai-chat-form" class="flex gap-2 pt-1">
+                        <input type="text" id="ai-chat-input" placeholder="සෞඛ්‍යය හෝ period ගැන ප්‍රශ්නයක් අසන්න..."
+                            class="flex-1 bg-rose-50/60 border border-rose-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500">
+                        <button type="submit"
+                            class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-xs shadow-sm transition">
+                            යවන්න
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 5: INSIGHTS & REPORTS -->
+            <section id="view-insights" class="space-y-4 hidden animate-fade-in">
+                <div class="glass-card rounded-3xl p-5 space-y-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-base font-extrabold text-slate-800">📊 Daily & Monthly Health Report</h2>
+                            <p class="text-xs text-slate-500">Water, Period, Pain, General Symptoms & Monthly Trends</p>
+                        </div>
+                        <button id="btn-share-daily-report-wa" type="button"
+                            class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold shadow-sm transition">
+                            💬 Daily WA
+                        </button>
+                    </div>
+
+                    <div id="daily-health-report-box" class="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 text-xs text-slate-700 space-y-1.5 leading-relaxed"></div>
+
+                    <div class="pt-3 border-t border-rose-100 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-extrabold text-slate-800">🗓️ Monthly Analysis</span>
+                            <input type="month" id="monthly-report-picker"
+                                class="bg-white border border-rose-200 rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-800">
+                        </div>
+                        <div id="monthly-health-report-box" class="p-3.5 rounded-2xl bg-pink-50/70 border border-pink-100 text-xs text-slate-700 space-y-1.5 leading-relaxed"></div>
+                        <button id="btn-share-monthly-wa" type="button"
+                            class="w-full py-2.5 px-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition shadow-sm">
+                            💬 Monthly Report එක WhatsApp වෙත යවන්න
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Medical Disclaimer Note -->
+                <div class="p-3.5 rounded-2xl bg-white/80 border border-rose-100 text-[11px] text-slate-500 text-center">
+                    *මෙය තොරතුරු දැනගැනීමේ අරමුණින් පමණි. වෛද්‍ය උපදෙස් හෝ රෝග විනිශ්චයක් සඳහා සුදුසුකම් ලත් වෘත්තිකයෙකු හමුවන්න.*
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="fixed bottom-3 inset-x-0 z-40 px-3 pointer-events-none">
+            <div class="max-w-xl mx-auto pointer-events-auto bg-white/82 backdrop-blur-2xl border border-white/80 shadow-xl shadow-rose-950/10 rounded-[26px] px-1.5 py-1.5">
+                <div class="grid grid-cols-6 gap-0.5">
+                    <button type="button" data-target="view-dashboard" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-rose-600 bg-rose-50 font-bold transition">
+                        <span class="text-base leading-none">🏠</span>
+                        <span class="text-[10px] mt-1">මුල්</span>
+                    </button>
+                    <button type="button" data-target="view-calendar" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-slate-500 hover:text-rose-600 transition">
+                        <span class="text-base leading-none">📅</span>
+                        <span class="text-[10px] mt-1">දින දර්ශන</span>
+                    </button>
+                    <button type="button" data-target="view-logger" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-slate-500 hover:text-rose-600 transition">
+                        <span class="text-base leading-none">✍️</span>
+                        <span class="text-[10px] mt-1">සටහන්</span>
+                    </button>
+                    <button type="button" data-target="view-assistant" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-slate-500 hover:text-rose-600 transition">
+                        <span class="text-base leading-none">🤖</span>
+                        <span class="text-[10px] mt-1">AI සහායක</span>
+                    </button>
+                    <button type="button" data-target="view-insights" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-slate-500 hover:text-rose-600 transition">
+                        <span class="text-base leading-none">📊</span>
+                        <span class="text-[10px] mt-1">වාර්තා</span>
+                    </button>
+                    <button type="button" data-target="view-settings" class="ios-press nav-btn flex flex-col items-center py-1.5 rounded-[18px] text-slate-500 hover:text-rose-600 transition">
+                        <span class="text-base leading-none">⚙️</span>
+                        <span class="text-[10px] mt-1">සැකසුම්</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- DEDICATED APP SETTINGS VIEW (INJECTED INTO MAIN SHELL) -->
+    <template id="tpl-view-settings">
+        <section id="view-settings" class="space-y-4 hidden animate-fade-in">
+            <!-- Falling Flowers & Optical Controls -->
+            <div class="glass-card rounded-3xl p-5 space-y-4">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-800">🌸 වැටෙන මල් & Optical සැකසුම්</h2>
+                        <p class="text-xs text-slate-500">Background එකේ වැටෙන මල් වර්ග, ප්‍රමාණය (Size) සහ පෙනෙන මට්ටම (Opacity)</p>
+                    </div>
+                    <label class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 cursor-pointer">
+                        <input type="checkbox" id="petal-enabled-toggle" class="w-4 h-4 accent-rose-500 rounded">
+                        <span>සක්‍රීයයි</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-2">මල් වර්ගය තෝරන්න (Flower Style)</label>
+                    <div id="petal-style-options" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" data-petal-style="sakura" class="petal-style-chip py-2 px-2.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-bold text-slate-700 transition">🌸 Sakura</button>
+                        <button type="button" data-petal-style="rose" class="petal-style-chip py-2 px-2.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-bold text-slate-700 transition">🌹 Rose</button>
+                        <button type="button" data-petal-style="lotus" class="petal-style-chip py-2 px-2.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-bold text-slate-700 transition">🪷 Lotus</button>
+                        <button type="button" data-petal-style="blossom" class="petal-style-chip py-2 px-2.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs font-bold text-slate-700 transition">🌼 Blossom</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-100">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+                            <span>මල් ප්‍රමාණය (Size)</span>
+                            <span id="petal-size-label" class="text-rose-600">22px</span>
+                        </div>
+                        <input type="range" id="petal-size-range" min="12" max="42" step="2" value="22"
+                            class="w-full accent-rose-500 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-100">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+                            <span>Optical Range (Opacity)</span>
+                            <span id="petal-opacity-label" class="text-rose-600">34%</span>
+                        </div>
+                        <input type="range" id="petal-opacity-range" min="8" max="80" step="2" value="34"
+                            class="w-full accent-rose-500 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optional Gemini API Key -->
+            <div class="glass-card rounded-3xl p-5 space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-800">🤖 Gemini AI Key (Optional)</h3>
+                <p class="text-xs text-slate-500">API Key එකක් නැතුවත් Offline Smart Care Mode වැඩ කරයි. Gemini API Key එකක් ඇතුළත් කළහොත් AI Chat සක්‍රීය වේ.</p>
+                <div class="flex gap-2">
+                    <input type="password" id="set-gemini-key" placeholder="Gemini API Key (Optional)"
+                        class="flex-1 bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500">
+                    <button id="btn-save-gemini-key" type="button"
+                        class="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs transition">
+                        Save Key
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Receiver Contact Settings -->
+            <div class="glass-card rounded-3xl p-5 space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-800">💑 Report Receiver Contact</h3>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp අංකය (Country code සමඟ)</label>
+                    <input type="tel" id="set-bf-whatsapp" placeholder="947XXXXXXXX"
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email ලිපිනය</label>
+                    <input type="email" id="set-bf-email" placeholder="name@example.com"
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-500">
+                </div>
+                <button id="btn-save-contacts" type="button"
+                    class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl text-xs transition">
+                    සම්බන්ධතා සුරකින්න
+                </button>
+            </div>
+
+            <!-- Custom Care Notes -->
+            <div class="glass-card rounded-3xl p-5 space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-800">💌 විශේෂ Care Notes වෙනස් කරන්න</h3>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Period දින සඳහා</label>
+                    <input type="text" id="note-edit-period" class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">PMS දින සඳහා</label>
+                    <input type="text" id="note-edit-pms" class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Ovulation දින සඳහා</label>
+                    <input type="text" id="note-edit-ovulation" class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">සාමාන්‍ය දින සඳහා</label>
+                    <input type="text" id="note-edit-normal" class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                </div>
+                <button id="btn-save-notes" type="button"
+                    class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl text-xs transition">
+                    පණිවිඩ සුරකින්න
+                </button>
+            </div>
+
+            <!-- Profile, Water Goal & PIN -->
+            <div class="glass-card rounded-3xl p-5 space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-800">🔐 Appearance, Profile, Water Goal & PIN</h3>
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-rose-50/70 border border-rose-100">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">Display Theme (Light / Dark)</div>
+                        <div class="text-[11px] text-slate-500">රාත්‍රී කාලයේදී ඇසට පහසු Dark Mode හෝ දිවා Light Mode</div>
+                    </div>
+                    <button id="btn-settings-theme-toggle" type="button"
+                        class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold shadow-sm transition">
+                        Switch Mode
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">නම</label>
+                        <input type="text" id="set-user-name" class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ජල ඉලක්කය (ml)</label>
+                        <input type="number" id="set-water-goal" step="100" min="500" max="5000" class="w-full bg-sky-50/60 border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">නව PIN අංකය (ඉලක්කම් 4ක් - වෙනස් කිරීමට පමණි)</label>
+                    <input type="password" id="set-new-pin" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="••••"
+                        class="w-full bg-rose-50/50 border border-rose-200 rounded-xl px-3 py-2 text-xs text-slate-800 tracking-[0.4em]">
+                </div>
+                <button id="btn-save-profile" type="button"
+                    class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl text-xs transition">
+                    සැකසුම් යාවත්කාලීන කරන්න
+                </button>
+            </div>
+
+            <!-- Backup & Restore -->
+            <div class="glass-card rounded-3xl p-5 space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-800">💾 Backup & Restore (JSON)</h3>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button id="btn-export-json" type="button"
+                        class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2.5 px-3 rounded-2xl text-xs transition">
+                        ⬇️ Export Backup
+                    </button>
+                    <label class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2.5 px-3 rounded-2xl text-xs transition text-center cursor-pointer">
+                        ⬆️ Import Backup
+                        <input type="file" id="import-json-input" accept=".json" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Medical Disclaimer Note -->
+            <div class="p-3.5 rounded-2xl bg-white/80 border border-rose-100 text-[11px] text-slate-500 text-center">
+                *මෙය තොරතුරු දැනගැනීමේ අරමුණින් පමණි. වෛද්‍ය උපදෙස් හෝ රෝග විනිශ්චයක් සඳහා සුදුසුකම් ලත් වෘත්තිකයෙකු හමුවන්න.*
+            </div>
+        </section>
+    </template>
+
+    <script>
+        // Mount dedicated App Settings tab into <main> before wiring events
+        (function mountSettingsTab() {
+            const tpl = document.getElementById('tpl-view-settings');
+            const mainEl = document.querySelector('#screen-app main');
+            if (tpl && mainEl && !document.getElementById('view-settings')) {
+                mainEl.appendChild(tpl.content.cloneNode(true));
+            }
+        })();
+
+        // =========================================================================
+        // 1. CONSTANTS, STATE & DATE HELPERS
+        // =========================================================================
+        const STORAGE_KEY = "lunacare_v1_data";
+
+        const DEFAULT_CARE_NOTES = {
+            period: "මේ දිනවල හොඳින් විවේක ගන්න, උණුසුම් ජලය පානය කරන්න. අවශ්‍ය ඕනෑම වෙලාවක මම ළඟින් ඉන්නවා 🌸",
+            pms: "මීළඟ ඔසප් දින ළං වෙමින් පවතී. සැහැල්ලු ආහාර, ප්‍රමාණවත් නින්ද සහ සන්සුන් බව වැදගත් වේ 🌷",
+            ovulation: "මෙය ඔබේ චක්‍රයේ සරු කාලයයි. ජල පානය සහ සමබර ආහාර සමඟ සෞඛ්‍ය සම්පන්නව සිටින්න ✨",
+            normal: "සෑම දිනකම ප්‍රමාණවත් තරම් ජලය පානය කරමින් ඔබේ සෞඛ්‍යය ගැන සැලකිලිමත් වන්න 🌿"
+        };
+
+        const PAIN_DESCRIPTIONS = {
+            0: "0 - වේදනාවක් නැත",
+            1: "1 - සුළු අපහසුතාවක්",
+            2: "2 - මධ්‍යස්ථ වේදනාවක්",
+            3: "3 - සැලකිය යුතු වේදනාවක්",
+            4: "4 - තදබල වේදනාවක්",
+            5: "5 - ඉතා තදබල වේදනාවක්"
+        };
+
+        let appData = {
+            isSetupDone: false,
+            themeMode: "light",
+            petalSettings: {
+                enabled: true,
+                style: "sakura",
+                size: 22,
+                opacityPct: 34
+            },
+            userName: "",
+            pin: "1234",
+            defaultCycleLength: 28,
+            defaultPeriodDuration: 5,
+            dailyWaterGoal: 2000,
+            periodStarts: [],
+            dailyLogs: {},
+            waterLogs: {},
+            bfWhatsapp: "",
+            bfEmail: "",
+            geminiApiKey: "",
+            careNotes: { ...DEFAULT_CARE_NOTES }
+        };
+
+        let currentEnteredPin = "";
+        let selectedLogDate = getTodayStr();
+        let calendarViewDate = new Date();
+        let currentFlowValue = "නැත (None)";
+        let currentPainValue = 0;
+        let currentGenSeverityValue = 0;
+        let currentLoggerWaterMl = 0;
+        let currentSelections = {
+            moods: [],
+            symptoms: [],
+            genSymptoms: [],
+            cravings: []
+        };
+        let chatHistory = [];
+        let deferredInstallPrompt = null;
+        let toastTimer = null;
+
+        function getTodayStr() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function parseLocalDate(dateStr) {
+            const parts = String(dateStr || getTodayStr()).split('-').map(Number);
+            return new Date(parts[0] || 2026, (parts[1] || 1) - 1, parts[2] || 1);
+        }
+
+        function formatDateStr(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function addDays(dateStr, days) {
+            const dt = parseLocalDate(dateStr);
+            dt.setDate(dt.getDate() + Number(days || 0));
+            return formatDateStr(dt);
+        }
+
+        function diffDays(startStr, endStr) {
+            const a = parseLocalDate(startStr);
+            const b = parseLocalDate(endStr);
+            const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+            const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+            return Math.round((utcB - utcA) / 86400000);
+        }
+
+        function formatReadableSinhalaDate(dateStr) {
+            const dt = parseLocalDate(dateStr);
+            const months = ["ජන", "පෙබ", "මාර්", "අප්‍රේ", "මැයි", "ජූනි", "ජූලි", "අගෝ", "සැප්", "ඔක්", "නොවැ", "දෙසැ"];
+            return `${dt.getFullYear()} ${months[dt.getMonth()]} ${dt.getDate()}`;
+        }
+
+        function showToast(message, icon = "🌸") {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            const iconEl = document.getElementById('toast-icon');
+            if (!toast || !msgEl || !iconEl) return;
+
+            msgEl.textContent = message;
+            iconEl.textContent = icon;
+            toast.classList.remove('opacity-0', '-translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-3');
+            }, 2600);
+        }
+
+        function saveAppData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            } catch (err) {
+                console.warn("Storage save failed:", err);
+            }
+        }
+
+        function applyThemeMode(mode) {
+            const isDark = mode === "dark";
+            appData.themeMode = isDark ? "dark" : "light";
+            document.body.classList.toggle('theme-dark', isDark);
+
+            const iconEl = document.getElementById('theme-toggle-icon');
+            const lblEl = document.getElementById('theme-toggle-label');
+            if (iconEl) iconEl.textContent = isDark ? "☀️" : "🌙";
+            if (lblEl) lblEl.textContent = isDark ? "Light" : "Dark";
+        }
+
+        function toggleThemeMode() {
+            const nextMode = appData.themeMode === "dark" ? "light" : "dark";
+            applyThemeMode(nextMode);
+            saveAppData();
+            showToast(nextMode === "dark" ? "Dark Mode සක්‍රීයයි" : "Light Mode සක්‍රීයයි", nextMode === "dark" ? "🌙" : "☀️");
+        }
+
+        function loadAppData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    appData = {
+                        ...appData,
+                        ...parsed,
+                        themeMode: parsed.themeMode === "dark" ? "dark" : "light",
+                        petalSettings: {
+                            enabled: parsed.petalSettings?.enabled !== false,
+                            style: ["sakura", "rose", "lotus", "blossom"].includes(parsed.petalSettings?.style)
+                                ? parsed.petalSettings.style
+                                : "sakura",
+                            size: Math.min(42, Math.max(12, Number(parsed.petalSettings?.size) || 22)),
+                            opacityPct: Math.min(80, Math.max(8, Number(parsed.petalSettings?.opacityPct) || 34))
+                        },
+                        periodStarts: Array.isArray(parsed.periodStarts) ? parsed.periodStarts : [],
+                        dailyLogs: parsed.dailyLogs && typeof parsed.dailyLogs === 'object' ? parsed.dailyLogs : {},
+                        waterLogs: parsed.waterLogs && typeof parsed.waterLogs === 'object' ? parsed.waterLogs : {},
+                        careNotes: { ...DEFAULT_CARE_NOTES, ...(parsed.careNotes || {}) }
+                    };
+                }
+                if (!appData.dailyWaterGoal) appData.dailyWaterGoal = 2000;
+            } catch (err) {
+                console.warn("Storage load issue:", err);
+            }
+            applyThemeMode(appData.themeMode);
+        }
+
+        // =========================================================================
+        // 2. SCREEN NAVIGATION & PIN LOCK
+        // =========================================================================
+        function showScreen(screenId) {
+            ['screen-setup', 'screen-lock', 'screen-app'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', id !== screenId);
+            });
+        }
+
+        function lockApp() {
+            currentEnteredPin = "";
+            updatePinDotsUI();
+            const errEl = document.getElementById('pin-error');
+            if (errEl) errEl.textContent = "";
+            const greetEl = document.getElementById('lock-greeting');
+            if (greetEl) greetEl.textContent = appData.userName ? `ආයුබෝවන්, ${appData.userName}!` : "ආයුබෝවන්!";
+            showScreen('screen-lock');
+        }
+
+        function unlockApp() {
+            currentEnteredPin = "";
+            updatePinDotsUI();
+            showScreen('screen-app');
+            if (chatHistory.length === 0) {
+                const displayName = appData.userName || "ඔබ";
+                chatHistory.push({
+                    role: "assistant",
+                    text: `ආයුබෝවන් ${displayName}! 🌸 මම ඔබේ AI Health Assistant. අද water intake, period phase සහ රෝග ලක්ෂණ බලලා care tips දෙන්න මම සූදානම්. (මෙය තොරතුරු සඳහා පමණි; වෛද්‍ය උපදෙස් සඳහා වෛද්‍යවරයෙකු හමුවන්න.)`
+                });
+            }
+            refreshAllViews();
+        }
+
+        function updatePinDotsUI() {
+            const dots = document.querySelectorAll('#pin-dots .pin-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('filled', idx < currentEnteredPin.length);
+            });
+        }
+
+        function handlePinDigit(num) {
+            if (currentEnteredPin.length >= 4) return;
+            currentEnteredPin += String(num);
+            updatePinDotsUI();
+            const errEl = document.getElementById('pin-error');
+            if (errEl) errEl.textContent = "";
+
+            if (currentEnteredPin.length === 4) {
+                setTimeout(() => {
+                    if (currentEnteredPin === String(appData.pin)) {
+                        unlockApp();
+                    } else {
+                        if (errEl) errEl.textContent = "වැරදි PIN අංකයකි! නැවත උත්සාහ කරන්න.";
+                        currentEnteredPin = "";
+                        updatePinDotsUI();
+                    }
+                }, 140);
+            }
+        }
+
+        // =========================================================================
+        // 3. CYCLE & LIFETIME PREDICTION ENGINE
+        // =========================================================================
+        function getAllPeriodStartDates() {
+            const set = new Set(appData.periodStarts || []);
+            Object.entries(appData.dailyLogs || {}).forEach(([dateStr, log]) => {
+                if (log && log.isPeriod) {
+                    const prevDay = addDays(dateStr, -1);
+                    const prevLoggedPeriod = Boolean(appData.dailyLogs[prevDay]?.isPeriod);
+                    if (!prevLoggedPeriod) {
+                        const hasNearbyStart = Array.from(set).some(s => Math.abs(diffDays(s, dateStr)) <= 3);
+                        if (!hasNearbyStart) set.add(dateStr);
+                    }
+                }
+            });
+            return Array.from(set).sort();
+        }
+
+        function calculateCycleStats() {
+            const starts = getAllPeriodStartDates();
+            const today = getTodayStr();
+            const fallbackStart = starts.length ? starts[starts.length - 1] : today;
+
+            let avgCycle = Number(appData.defaultCycleLength) || 28;
+            if (starts.length >= 2) {
+                const diffs = [];
+                for (let i = 1; i < starts.length; i++) {
+                    const d = diffDays(starts[i - 1], starts[i]);
+                    if (d >= 18 && d <= 50) diffs.push(d);
+                }
+                if (diffs.length > 0) {
+                    avgCycle = Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length);
+                }
+            }
+
+            const periodDuration = Number(appData.defaultPeriodDuration) || 5;
+            let anchorStart = fallbackStart;
+            while (addDays(anchorStart, avgCycle) <= addDays(today, -periodDuration)) {
+                anchorStart = addDays(anchorStart, avgCycle);
+            }
+
+            const nextPeriodDate = diffDays(anchorStart, today) >= avgCycle
+                ? addDays(anchorStart, avgCycle)
+                : anchorStart;
+
+            const prevCycleStart = starts.length
+                ? (diffDays(anchorStart, today) >= avgCycle
+                    ? anchorStart
+                    : (starts.length >= 2 && diffDays(starts[starts.length - 1], today) >= 0
+                        ? starts[starts.length - 1]
+                        : addDays(nextPeriodDate, -avgCycle)))
+                : addDays(nextPeriodDate, -avgCycle);
+
+            const daysSincePrevStart = Math.max(0, diffDays(prevCycleStart, today));
+            const currentCycleDay = (daysSincePrevStart % avgCycle) + 1;
+            const daysUntilNextPeriod = diffDays(today, nextPeriodDate);
+
+            const ovulationDate = addDays(nextPeriodDate, -14);
+            const fertileStart = addDays(ovulationDate, -4);
+            const fertileEnd = addDays(ovulationDate, 1);
+
+            let phaseKey = "normal";
+            let phaseBadge = "🌿 සාමාන්‍ය අවධිය (Normal)";
+            let phaseTitle = "සාමාන්‍ය දවසක්";
+            let phaseSub = `මීළඟ ඔසප් දිනය ${formatReadableSinhalaDate(nextPeriodDate)} වේ.`;
+
+            const isTodayLoggedPeriod = Boolean(appData.dailyLogs[today]?.isPeriod);
+            const inPredictedPeriodWindow = diffDays(prevCycleStart, today) >= 0 && diffDays(prevCycleStart, today) < periodDuration;
+
+            if (isTodayLoggedPeriod || inPredictedPeriodWindow) {
+                phaseKey = "period";
+                phaseBadge = "🩸 ඔසප් කාලය (Period Days)";
+                phaseTitle = "ඔසප් දින කාලය";
+                phaseSub = "විවේකය සහ උණුසුම් ජලය පානය කිරීම වැදගත් වේ.";
+            } else if (daysUntilNextPeriod >= 0 && daysUntilNextPeriod <= 5) {
+                phaseKey = "pms";
+                phaseBadge = "🌷 PMS අවධිය (Pre-Period)";
+                phaseTitle = `ඔසප් වීමට තව දින ${daysUntilNextPeriod}`;
+                phaseSub = `අනුමාන දිනය: ${formatReadableSinhalaDate(nextPeriodDate)}`;
+            } else if (diffDays(fertileStart, today) >= 0 && diffDays(today, fertileEnd) >= 0) {
+                phaseKey = "ovulation";
+                phaseBadge = "🥚 සරු කාලය / Ovulation";
+                phaseTitle = today === ovulationDate ? "අද ඩිම්බ මෝචන දිනයයි" : "සරු කාලය (Fertile Window)";
+                phaseSub = `අනුමාන Ovulation දිනය: ${formatReadableSinhalaDate(ovulationDate)}`;
+            } else {
+                phaseTitle = daysUntilNextPeriod > 0 ? `මීළඟ ඔසප් දිනයට තව දින ${daysUntilNextPeriod}` : "චක්‍රය යාවත්කාලීන වෙමින්";
+                phaseSub = `අනුමාන දිනය: ${formatReadableSinhalaDate(nextPeriodDate)}`;
+            }
+
+            const predictedStarts = new Set(starts);
+            let cursor = addDays(nextPeriodDate, -avgCycle * 6);
+            const horizonEnd = addDays(today, 365 * 3);
+            while (cursor <= horizonEnd) {
+                predictedStarts.add(cursor);
+                cursor = addDays(cursor, avgCycle);
+            }
+
+            return {
+                avgCycle,
+                periodDuration,
+                currentCycleDay,
+                daysUntilNextPeriod,
+                nextPeriodDate,
+                ovulationDate,
+                fertileStart,
+                fertileEnd,
+                phaseKey,
+                phaseBadge,
+                phaseTitle,
+                phaseSub,
+                predictedStarts: Array.from(predictedStarts).sort()
+            };
+        }
+
+        // =========================================================================
+        // 4. 100ml WATER METER & HEALTH LOGGING
+        // =========================================================================
+        function getWaterForDate(dateStr) {
+            if (typeof appData.waterLogs?.[dateStr] === "number") {
+                return appData.waterLogs[dateStr];
+            }
+            return Number(appData.dailyLogs?.[dateStr]?.waterMl) || 0;
+        }
+
+        function setWaterForDate(dateStr, ml) {
+            const safeMl = Math.max(0, Math.min(10000, Math.round(ml)));
+            appData.waterLogs[dateStr] = safeMl;
+            if (!appData.dailyLogs[dateStr]) {
+                appData.dailyLogs[dateStr] = {
+                    isPeriod: false,
+                    flow: "නැත (None)",
+                    pain: 0,
+                    genSeverity: 0,
+                    moods: [],
+                    symptoms: [],
+                    genSymptoms: [],
+                    cravings: [],
+                    note: "",
+                    waterMl: safeMl
+                };
+            } else {
+                appData.dailyLogs[dateStr].waterMl = safeMl;
+            }
+        }
+
+        function adjustTodayWater(deltaMl) {
+            const today = getTodayStr();
+            const current = getWaterForDate(today);
+            const nextVal = Math.max(0, current + deltaMl);
+            setWaterForDate(today, nextVal);
+            saveAppData();
+            refreshAllViews();
+            const signText = deltaMl >= 0 ? `+${deltaMl}ml` : `${deltaMl}ml`;
+            showToast(`ජල ප්‍රමාණය ${signText} (${nextVal} ml)`, "💧");
+        }
+
+        function setFlowSelection(flowVal) {
+            currentFlowValue = flowVal;
+            document.querySelectorAll('#flow-options .flow-chip').forEach(btn => {
+                btn.classList.toggle('chip-active', btn.dataset.flow === flowVal);
+            });
+        }
+
+        function setPainSelection(painVal) {
+            currentPainValue = Number(painVal) || 0;
+            document.querySelectorAll('#pain-options .pain-chip').forEach(btn => {
+                btn.classList.toggle('chip-active', Number(btn.dataset.pain) === currentPainValue);
+            });
+            const lbl = document.getElementById('pain-label-text');
+            if (lbl) lbl.textContent = PAIN_DESCRIPTIONS[currentPainValue] || `${currentPainValue}`;
+        }
+
+        function setGeneralSeveritySelection(sevVal) {
+            currentGenSeverityValue = Number(sevVal) || 0;
+            document.querySelectorAll('#gen-severity-options .sev-chip').forEach(btn => {
+                btn.classList.toggle('chip-active', Number(btn.dataset.sev) === currentGenSeverityValue);
+            });
+        }
+
+        function toggleMultiChipUI(btn) {
+            const group = btn.dataset.group;
+            const val = btn.dataset.val;
+            if (!group || !val || !currentSelections[group]) return;
+            const idx = currentSelections[group].indexOf(val);
+            if (idx >= 0) {
+                currentSelections[group].splice(idx, 1);
+                btn.classList.remove('chip-active');
+            } else {
+                currentSelections[group].push(val);
+                btn.classList.add('chip-active');
+            }
+        }
+
+        function loadLoggerForDate(dateStr) {
+            selectedLogDate = dateStr || getTodayStr();
+            const dateInput = document.getElementById('log-date-input');
+            if (dateInput) dateInput.value = selectedLogDate;
+
+            const log = appData.dailyLogs[selectedLogDate] || {};
+            const periodCb = document.getElementById('log-is-period');
+            if (periodCb) periodCb.checked = Boolean(log.isPeriod);
+
+            currentLoggerWaterMl = getWaterForDate(selectedLogDate);
+            const waterDisp = document.getElementById('log-water-display');
+            if (waterDisp) waterDisp.textContent = `${currentLoggerWaterMl} ml`;
+
+            setFlowSelection(log.flow || "නැත (None)");
+            setPainSelection(log.pain ?? 0);
+            setGeneralSeveritySelection(log.genSeverity ?? 0);
+
+            currentSelections = {
+                moods: Array.isArray(log.moods) ? [...log.moods] : [],
+                symptoms: Array.isArray(log.symptoms) ? [...log.symptoms] : [],
+                genSymptoms: Array.isArray(log.genSymptoms) ? [...log.genSymptoms] : [],
+                cravings: Array.isArray(log.cravings) ? [...log.cravings] : []
+            };
+
+            document.querySelectorAll('.multi-chip').forEach(btn => {
+                const grp = btn.dataset.group;
+                const val = btn.dataset.val;
+                const active = currentSelections[grp]?.includes(val);
+                btn.classList.toggle('chip-active', Boolean(active));
+            });
+
+            const noteEl = document.getElementById('log-note');
+            if (noteEl) noteEl.value = log.note || "";
+        }
+
+        function collectAndSaveCurrentLog(silent = false) {
+            const dStr = document.getElementById('log-date-input')?.value || selectedLogDate || getTodayStr();
+            const isPeriod = Boolean(document.getElementById('log-is-period')?.checked);
+            const note = (document.getElementById('log-note')?.value || "").trim();
+
+            if (isPeriod) {
+                const prevDay = addDays(dStr, -1);
+                const prevWasPeriod = Boolean(appData.dailyLogs[prevDay]?.isPeriod);
+                if (!prevWasPeriod && !appData.periodStarts.includes(dStr)) {
+                    const nearExisting = appData.periodStarts.some(s => Math.abs(diffDays(s, dStr)) <= 3);
+                    if (!nearExisting) appData.periodStarts.push(dStr);
+                }
+            }
+
+            setWaterForDate(dStr, currentLoggerWaterMl);
+            appData.dailyLogs[dStr] = {
+                isPeriod,
+                flow: currentFlowValue,
+                pain: currentPainValue,
+                genSeverity: currentGenSeverityValue,
+                moods: [...currentSelections.moods],
+                symptoms: [...currentSelections.symptoms],
+                genSymptoms: [...currentSelections.genSymptoms],
+                cravings: [...currentSelections.cravings],
+                note,
+                waterMl: currentLoggerWaterMl
+            };
+
+            saveAppData();
+            refreshAllViews();
+            if (!silent) showToast(`${dStr} සටහන සුරකින ලදී! 💾`);
+            return dStr;
+        }
+
+        // =========================================================================
+        // 5. DAILY & MONTHLY REPORTS + WHATSAPP / EMAIL SHARING
+        // =========================================================================
+        function buildDailySummaryText(dateStr) {
+            const stats = calculateCycleStats();
+            const log = appData.dailyLogs[dateStr] || {};
+            const waterMl = getWaterForDate(dateStr);
+            const goalMl = Number(appData.dailyWaterGoal) || 2000;
+            const waterPct = Math.min(100, Math.round((waterMl / goalMl) * 100));
+
+            const genSymText = (log.genSymptoms && log.genSymptoms.length)
+                ? `${log.genSymptoms.join(", ")} (Severity ${log.genSeverity ?? 0}/5)`
+                : "නැත";
+
+            const lines = [
+                `🌸 *LunaCare Daily Health & Care Report*`,
+                `👤 නම: ${appData.userName || "User"} | 📅 දිනය: ${dateStr}`,
+                `🔄 චක්‍ර දිනය: Day ${stats.currentCycleDay} | ${stats.phaseBadge}`,
+                `🗓️ මීළඟ Period (අනුමාන): ${stats.nextPeriodDate} (තව දින ${Math.max(0, stats.daysUntilNextPeriod)})`,
+                `💧 Water Intake: ${waterMl}ml / ${goalMl}ml (${waterPct}%)`,
+                `🩸 Period Status: ${log.isPeriod ? "ඔව්" : "නැත"} | Flow: ${log.flow || "නැත (None)"}`,
+                `😣 Pain Level: ${log.pain ?? 0}/5`,
+                `🩺 General Symptoms: ${genSymText}`,
+                `😊 Moods: ${(log.moods && log.moods.length) ? log.moods.join(", ") : "සඳහන් කර නැත"}`,
+                `🍫 Cravings: ${(log.cravings && log.cravings.length) ? log.cravings.join(", ") : "නැත"}`
+            ];
+            if (log.note) lines.push(`📝 Note: ${log.note}`);
+            lines.push(`— LunaCare Care Update`);
+            return lines.join("\n");
+        }
+
+        function buildMonthlyReportText(yearMonth) {
+            const targetYm = yearMonth || getTodayStr().slice(0, 7);
+            const allDates = new Set([
+                ...Object.keys(appData.dailyLogs || {}),
+                ...Object.keys(appData.waterLogs || {})
+            ]);
+            const monthDates = Array.from(allDates).filter(d => d.startsWith(targetYm)).sort();
+
+            let periodDaysCount = 0;
+            let totalWaterMl = 0;
+            let waterLoggedDays = 0;
+            let maxPain = 0;
+            const symptomCounts = {};
+            const moodCounts = {};
+
+            monthDates.forEach(d => {
+                const log = appData.dailyLogs[d] || {};
+                if (log.isPeriod) periodDaysCount++;
+                const w = getWaterForDate(d);
+                if (w > 0) {
+                    totalWaterMl += w;
+                    waterLoggedDays++;
+                }
+                if ((log.pain || 0) > maxPain) maxPain = log.pain || 0;
+                (log.genSymptoms || []).forEach(s => { symptomCounts[s] = (symptomCounts[s] || 0) + 1; });
+                (log.symptoms || []).forEach(s => { symptomCounts[s] = (symptomCounts[s] || 0) + 1; });
+                (log.moods || []).forEach(m => { moodCounts[m] = (moodCounts[m] || 0) + 1; });
+            });
+
+            const avgWater = waterLoggedDays > 0 ? Math.round(totalWaterMl / waterLoggedDays) : 0;
+            const topSymptoms = Object.entries(symptomCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k} (${v})`).join(", ") || "සටහන් නැත";
+            const topMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k} (${v})`).join(", ") || "සටහන් නැත";
+
+            const htmlSummary = `
+                <div><b>මාසය:</b> ${targetYm} &nbsp;|&nbsp; <b>සටහන් දින:</b> ${monthDates.length}</div>
+                <div><b>Period දින:</b> ${periodDaysCount} &nbsp;|&nbsp; <b>උපරිම Pain:</b> ${maxPain}/5</div>
+                <div><b>සාමාන්‍ය Water Intake:</b> ${avgWater} ml / දිනකට</div>
+                <div><b>ප්‍රධාන රෝග ලක්ෂණ:</b> ${topSymptoms}</div>
+                <div><b>ප්‍රධාන Moods:</b> ${topMoods}</div>
+            `;
+
+            const whatsappText = [
+                `📊 *LunaCare Monthly Report (${targetYm})*`,
+                `👤 ${appData.userName || "User"}`,
+                `🩸 Period Days: ${periodDaysCount} | 😣 Peak Pain: ${maxPain}/5`,
+                `💧 Avg Water: ${avgWater}ml/day (${waterLoggedDays} logged days)`,
+                `🩺 Top Symptoms: ${topSymptoms}`,
+                `😊 Top Moods: ${topMoods}`
+            ].join("\n");
+
+            return { htmlSummary, whatsappText };
+        }
+
+        function sendRawTextViaWhatsApp(text) {
+            const rawPhone = (appData.bfWhatsapp || "").replace(/\D/g, "");
+            if (!rawPhone) {
+                showToast("කරුණාකර සැකසුම් තුළ WhatsApp අංකයක් ඇතුළත් කරන්න!", "⚠️");
+                return;
+            }
+            const normalizedPhone = rawPhone.startsWith("0") && rawPhone.length === 10
+                ? "94" + rawPhone.slice(1)
+                : rawPhone;
+            const url = `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(text)}`;
+            window.open(url, "_blank", "noopener,noreferrer");
+        }
+
+        function sendSummaryViaWhatsApp(dateStr) {
+            const text = buildDailySummaryText(dateStr || getTodayStr());
+            sendRawTextViaWhatsApp(text);
+        }
+
+        function sendSummaryViaEmail(dateStr) {
+            const targetDate = dateStr || getTodayStr();
+            const body = buildDailySummaryText(targetDate);
+            const subject = `LunaCare Health Summary (${appData.userName || "User"} - ${targetDate})`;
+            const toAddr = encodeURIComponent((appData.bfEmail || "").trim());
+            if (!toAddr) {
+                showToast("කරුණාකර සැකසුම් තුළ Email ලිපිනයක් ඇතුළත් කරන්න!", "⚠️");
+                return;
+            }
+            const mailtoUrl = `mailto:${toAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoUrl;
+        }
+
+        // =========================================================================
+        // 6. AI HEALTH ASSISTANT (CONTEXT + RED FLAGS + GEMINI / SMART FALLBACK)
+        // =========================================================================
+        function hasRedFlagCondition(promptText, log) {
+            const severePain = (log.pain || 0) >= 4 || (log.genSeverity || 0) >= 4;
+            const redWords = ["fever", "උණ", "chest pain", "breath", "හුස්ම", "faint", "කරකැවිල්ල", "severe", "තදබල", "bleeding", "ලේ"];
+            const lower = (promptText || "").toLowerCase();
+            const keywordHit = redWords.some(w => lower.includes(w));
+            return severePain || keywordHit;
+        }
+
+        function buildSmartOfflineAssistantReply(userPrompt, stats, log, waterMl) {
+            const goalMl = Number(appData.dailyWaterGoal) || 2000;
+            const remainingWater = Math.max(0, goalMl - waterMl);
+            const allSym = [...(log.genSymptoms || []), ...(log.symptoms || [])];
+            const redFlag = hasRedFlagCondition(userPrompt, log);
+
+            const parts = [];
+            parts.push(`අද (${getTodayStr()}) ${stats.phaseBadge} තත්ත්වයේ සිටින අතර, ඔබේ ජල පානය ${waterMl}ml / ${goalMl}ml (${remainingWater > 0 ? `තව ${remainingWater}ml අවශ්‍යයි` : "ඉලක්කය සම්පූර්ණයි!"}).`);
+
+            if (allSym.length > 0) {
+                parts.push(`සටහන් වූ රෝග ලක්ෂණ: ${allSym.join(", ")} (Pain: ${log.pain ?? 0}/5, Severity: ${log.genSeverity ?? 0}/5).`);
+            }
+
+            if (remainingWater > 0) {
+                parts.push(`💡 ඉදිරි පැය කිහිපය තුළ 100ml–200ml බැගින් වතුර බොන්න.`);
+            }
+            if (stats.phaseKey === "period" || (log.pain || 0) >= 2) {
+                parts.push(`🌸 උණුසුම් තැවීමක් (warm compress) සහ විවේකය වේදනාව සමනය කිරීමට උදව් විය හැක.`);
+            }
+            if (redFlag) {
+                parts.push(`⚠️ තදබල වේදනාවක්, උණක් හෝ අසාමාන්‍ය රෝග ලක්ෂණයක් ඇත්නම් කරුණාකර වෛද්‍යවරයෙකුගේ උපදෙස් ලබා ගන්න.`);
+            }
+            parts.push(`(සටහන: මෙය තොරතුරු සඳහා පමණි; වෛද්‍ය උපදෙස් සඳහා වෛද්‍යවරයෙකු හමුවන්න.)`);
+
+            return parts.join(" ");
+        }
+
+        async function askAiAssistant(promptText) {
+            const cleanPrompt = (promptText || "").trim();
+            if (!cleanPrompt) return;
+
+            const today = getTodayStr();
+            const stats = calculateCycleStats();
+            const log = appData.dailyLogs[today] || {};
+            const waterMl = getWaterForDate(today);
+
+            chatHistory.push({ role: "user", text: cleanPrompt });
+            renderAssistantView();
+
+            const banner = document.getElementById('ai-red-flag-banner');
+            if (banner) {
+                banner.classList.toggle('hidden', !hasRedFlagCondition(cleanPrompt, log));
+            }
+
+            const apiKey = (appData.geminiApiKey || "").trim();
+            if (!apiKey) {
+                const reply = buildSmartOfflineAssistantReply(cleanPrompt, stats, log, waterMl);
+                chatHistory.push({ role: "assistant", text: reply });
+                renderAssistantView();
+                return;
+            }
+
+            const contextPayload = {
+                date: today,
+                userName: appData.userName,
+                cycleDay: stats.currentCycleDay,
+                phase: stats.phaseBadge,
+                nextPeriodDate: stats.nextPeriodDate,
+                waterMl,
+                waterGoalMl: appData.dailyWaterGoal,
+                painLevel: log.pain ?? 0,
+                generalSeverity: log.genSeverity ?? 0,
+                generalSymptoms: log.genSymptoms || [],
+                cycleSymptoms: log.symptoms || [],
+                moods: log.moods || []
+            };
+
+            const systemInstruction = "You are a supportive Sinhala-first wellness helper inside LunaCare. Never diagnose diseases or prescribe drug dosages. Highlight red-flag symptoms and advise consulting a doctor when severe or persistent. Keep responses concise, warm, and clear in Sinhala.";
+            const fullUserMsg = `Context: ${JSON.stringify(contextPayload)}\nQuestion: ${cleanPrompt}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+            let finalReply = "";
+            const delays = [800, 1600, 3200];
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const resp = await fetch(endpoint, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: fullUserMsg }] }],
+                            systemInstruction: { parts: [{ text: systemInstruction }] }
+                        })
+                    });
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const data = await resp.json();
+                    const textOut = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (textOut) {
+                        finalReply = textOut.trim();
+                        break;
+                    }
+                } catch (err) {
+                    if (attempt < delays.length) {
+                        await new Promise(r => setTimeout(r, delays[attempt]));
+                    } else {
+                        finalReply = buildSmartOfflineAssistantReply(cleanPrompt, stats, log, waterMl);
+                    }
+                }
+            }
+
+            chatHistory.push({ role: "assistant", text: finalReply });
+            renderAssistantView();
+        }
+
+        function shareAssistantMessageToWhatsApp(text) {
+            const msg = `🤖 *LunaCare AI Assistant Note (${appData.userName || "User"})*\n\n${text}`;
+            sendRawTextViaWhatsApp(msg);
+        }
+
+        // =========================================================================
+        // 7. RENDERING VIEWS (DASHBOARD, CALENDAR, ASSISTANT, INSIGHTS, SETTINGS)
+        // =========================================================================
+        function renderDashboard() {
+            const stats = calculateCycleStats();
+            const today = getTodayStr();
+            const log = appData.dailyLogs[today] || {};
+            const waterMl = getWaterForDate(today);
+            const goalMl = Number(appData.dailyWaterGoal) || 2000;
+            const waterPct = Math.min(100, Math.round((waterMl / goalMl) * 100));
+
+            const headerSub = document.getElementById('header-date-sub');
+            if (headerSub) headerSub.textContent = `${appData.userName || "LunaCare"} • ${formatReadableSinhalaDate(today)}`;
+
+            const badge = document.getElementById('hero-phase-badge');
+            if (badge) badge.textContent = stats.phaseBadge;
+
+            const heroTitle = document.getElementById('hero-main-title');
+            if (heroTitle) heroTitle.textContent = stats.phaseTitle;
+
+            const heroSub = document.getElementById('hero-sub-desc');
+            if (heroSub) heroSub.textContent = stats.phaseSub;
+
+            const cycleDayEl = document.getElementById('hero-cycle-day');
+            if (cycleDayEl) cycleDayEl.textContent = `Day ${stats.currentCycleDay}`;
+
+            const waterAmtEl = document.getElementById('dash-water-amount');
+            if (waterAmtEl) waterAmtEl.textContent = `${waterMl} ml`;
+
+            const waterGoalLbl = document.getElementById('dash-water-goal-label');
+            if (waterGoalLbl) waterGoalLbl.textContent = `/ ${goalMl} ml (${waterPct}%)`;
+
+            const waterBar = document.getElementById('dash-water-bar');
+            if (waterBar) waterBar.style.width = `${waterPct}%`;
+
+            const waterStatus = document.getElementById('dash-water-status-text');
+            if (waterStatus) {
+                waterStatus.textContent = waterMl >= goalMl
+                    ? "අද දෛනික ජල ඉලක්කය සම්පූර්ණයි! 🎉"
+                    : `ඉලක්කයට තව ${goalMl - waterMl} ml අවශ්‍යයි`;
+            }
+
+            const nextPeriodEl = document.getElementById('stat-next-period');
+            if (nextPeriodEl) nextPeriodEl.textContent = formatReadableSinhalaDate(stats.nextPeriodDate);
+
+            const countdownEl = document.getElementById('stat-next-period-countdown');
+            if (countdownEl) {
+                countdownEl.textContent = stats.daysUntilNextPeriod >= 0
+                    ? `තව දින ${stats.daysUntilNextPeriod}කින්`
+                    : "සටහන් අනුව යාවත්කාලීන වේ";
+            }
+
+            const ovEl = document.getElementById('stat-ovulation');
+            if (ovEl) ovEl.textContent = formatReadableSinhalaDate(stats.ovulationDate);
+
+            const fertEl = document.getElementById('stat-fertile-window');
+            if (fertEl) fertEl.textContent = `${stats.fertileStart} සිට ${stats.fertileEnd}`;
+
+            const avgEl = document.getElementById('stat-avg-cycle');
+            if (avgEl) avgEl.textContent = `දින ${stats.avgCycle}`;
+
+            const healthEl = document.getElementById('stat-today-health');
+            const flowEl = document.getElementById('stat-today-flow');
+            const allSym = [...(log.genSymptoms || []), ...(log.symptoms || [])];
+            if (healthEl) {
+                healthEl.textContent = allSym.length
+                    ? `${allSym[0]} (Pain ${log.pain ?? 0}/5)`
+                    : `Pain මට්ටම: ${log.pain ?? 0}/5`;
+            }
+            if (flowEl) {
+                flowEl.textContent = log.isPeriod ? `Period • ${log.flow || "සාමාන්‍යයි"}` : `Mood: ${(log.moods && log.moods[0]) || "සටහන් නැත"}`;
+            }
+
+            const noteEl = document.getElementById('dash-care-note');
+            if (noteEl) {
+                noteEl.textContent = appData.careNotes[stats.phaseKey] || DEFAULT_CARE_NOTES.normal;
+            }
+        }
+
+        function renderCalendar() {
+            const stats = calculateCycleStats();
+            const year = calendarViewDate.getFullYear();
+            const month = calendarViewDate.getMonth();
+            const months = ["ජනවාරි", "පෙබරවාරි", "මාර්තු", "අප්‍රේල්", "මැයි", "ජූනි", "ජූලි", "අගෝස්තු", "සැප්තැම්බර්", "ඔක්තෝබර්", "නොවැම්බර්", "දෙසැම්බර්"];
+
+            const titleEl = document.getElementById('cal-month-title');
+            if (titleEl) titleEl.textContent = `${year} ${months[month]}`;
+
+            const grid = document.getElementById('calendar-grid');
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const todayStr = getTodayStr();
+
+            const predictedDaySet = new Set();
+            stats.predictedStarts.forEach(startStr => {
+                for (let d = 0; d < stats.periodDuration; d++) {
+                    predictedDaySet.add(addDays(startStr, d));
+                }
+            });
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const spacer = document.createElement('div');
+                spacer.className = "h-10";
+                grid.appendChild(spacer);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const mStr = String(month + 1).padStart(2, '0');
+                const dStr = String(day).padStart(2, '0');
+                const cellDate = `${year}-${mStr}-${dStr}`;
+                const log = appData.dailyLogs[cellDate];
+                const waterMl = getWaterForDate(cellDate);
+
+                const isLoggedPeriod = Boolean(log?.isPeriod);
+                const isPredictedPeriod = !isLoggedPeriod && predictedDaySet.has(cellDate);
+                const isOvulation = cellDate === stats.ovulationDate;
+                const hasLogDot = Boolean(log && ((log.genSymptoms && log.genSymptoms.length) || (log.symptoms && log.symptoms.length) || (log.pain > 0) || waterMl > 0));
+
+                let cellStyle = "bg-white/80 hover:bg-rose-50 text-slate-700 border border-rose-100";
+                if (isLoggedPeriod) {
+                    cellStyle = "bg-rose-500 text-white font-extrabold shadow-sm";
+                } else if (isPredictedPeriod) {
+                    cellStyle = "bg-rose-100 text-rose-700 font-bold border border-rose-300";
+                } else if (isOvulation) {
+                    cellStyle = "bg-pink-400 text-white font-bold";
+                }
+
+                if (cellDate === todayStr) {
+                    cellStyle += " ring-2 ring-rose-500 ring-offset-1";
+                }
+
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = `h-10 rounded-xl flex flex-col items-center justify-center text-xs transition relative ${cellStyle}`;
+                btn.innerHTML = `<span>${day}</span>${hasLogDot && !isLoggedPeriod ? `<span class="w-1.5 h-1.5 rounded-full ${isOvulation ? 'bg-white' : 'bg-sky-400'} mt-0.5"></span>` : ""}`;
+
+                btn.addEventListener('click', () => {
+                    selectedLogDate = cellDate;
+                    renderCalendarDetail(cellDate);
+                });
+
+                grid.appendChild(btn);
+            }
+
+            renderCalendarDetail(selectedLogDate);
+        }
+
+        function renderCalendarDetail(dateStr) {
+            const box = document.getElementById('cal-selected-detail');
+            if (!box) return;
+            const log = appData.dailyLogs[dateStr] || {};
+            const waterMl = getWaterForDate(dateStr);
+            const syms = [...(log.genSymptoms || []), ...(log.symptoms || [])];
+
+            box.innerHTML = `
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div>
+                        <h4 class="text-xs font-extrabold text-slate-800">${formatReadableSinhalaDate(dateStr)} (${dateStr})</h4>
+                        <p class="text-[11px] text-slate-500">Water: ${waterMl}ml • Pain: ${log.pain ?? 0}/5 • Flow: ${log.flow || "නැත"}</p>
+                    </div>
+                    <button id="btn-edit-cal-date" type="button" class="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-bold">
+                        සටහන් කරන්න ✍️
+                    </button>
+                </div>
+                <div class="text-xs text-slate-600 space-y-1">
+                    <div><b>රෝග ලක්ෂණ:</b> ${syms.length ? syms.join(", ") : "සටහන් නැත"}</div>
+                    <div><b>Moods:</b> ${(log.moods && log.moods.length) ? log.moods.join(", ") : "සටහන් නැත"}</div>
+                    ${log.note ? `<div><b>සටහන:</b> ${log.note}</div>` : ""}
+                </div>
+            `;
+
+            const editBtn = document.getElementById('btn-edit-cal-date');
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    loadLoggerForDate(dateStr);
+                    switchTab('view-logger');
+                });
+            }
+        }
+
+        function renderAssistantView() {
+            const today = getTodayStr();
+            const stats = calculateCycleStats();
+            const log = appData.dailyLogs[today] || {};
+            const waterMl = getWaterForDate(today);
+
+            const modeBadge = document.getElementById('ai-mode-badge');
+            if (modeBadge) {
+                modeBadge.textContent = appData.geminiApiKey
+                    ? "Gemini AI Connected ✨"
+                    : "Smart Care Mode (Offline Ready)";
+            }
+
+            const pill = document.getElementById('ai-context-pill');
+            if (pill) {
+                pill.textContent = `${waterMl}ml • Day ${stats.currentCycleDay}`;
+            }
+
+            const banner = document.getElementById('ai-red-flag-banner');
+            if (banner) {
+                banner.classList.toggle('hidden', !hasRedFlagCondition("", log));
+            }
+
+            const listEl = document.getElementById('ai-chat-messages');
+            if (!listEl) return;
+            listEl.innerHTML = "";
+
+            chatHistory.forEach(msg => {
+                const wrap = document.createElement('div');
+                const isUser = msg.role === "user";
+                wrap.className = `flex flex-col ${isUser ? "items-end" : "items-start"}`;
+
+                const bubble = document.createElement('div');
+                bubble.className = isUser
+                    ? "max-w-[85%] rounded-2xl rounded-br-sm bg-rose-500 text-white px-3.5 py-2.5 text-xs leading-relaxed shadow-sm"
+                    : "max-w-[90%] rounded-2xl rounded-bl-sm bg-rose-50 border border-rose-200 text-slate-800 px-3.5 py-2.5 text-xs leading-relaxed";
+                bubble.textContent = msg.text;
+                wrap.appendChild(bubble);
+
+                if (!isUser) {
+                    const shareBtn = document.createElement('button');
+                    shareBtn.type = "button";
+                    shareBtn.className = "mt-1 text-[10px] font-bold text-emerald-600 hover:underline flex items-center gap-1";
+                    shareBtn.textContent = "📲 WhatsApp එකට යවන්න";
+                    shareBtn.addEventListener('click', () => shareAssistantMessageToWhatsApp(msg.text));
+                    wrap.appendChild(shareBtn);
+                }
+
+                listEl.appendChild(wrap);
+            });
+
+            listEl.scrollTop = listEl.scrollHeight;
+        }
+
+        function renderInsightsAndSettings() {
+            const today = getTodayStr();
+            const log = appData.dailyLogs[today] || {};
+            const waterMl = getWaterForDate(today);
+            const goalMl = Number(appData.dailyWaterGoal) || 2000;
+            const syms = [...(log.genSymptoms || []), ...(log.symptoms || [])];
+
+            const dailyBox = document.getElementById('daily-health-report-box');
+            if (dailyBox) {
+                dailyBox.innerHTML = `
+                    <div><b>💧 ජල පානය:</b> ${waterMl} ml / ${goalMl} ml</div>
+                    <div><b>🩸 Period & Flow:</b> ${log.isPeriod ? "ඔව්" : "නැත"} (${log.flow || "නැත"}) • <b>Pain:</b> ${log.pain ?? 0}/5</div>
+                    <div><b>🩺 රෝග ලක්ෂණ:</b> ${syms.length ? `${syms.join(", ")} (Severity ${log.genSeverity ?? 0}/5)` : "සටහන් නැත"}</div>
+                    <div><b>😊 Moods:</b> ${(log.moods && log.moods.length) ? log.moods.join(", ") : "සටහන් නැත"}</div>
+                `;
+            }
+
+            const monthPicker = document.getElementById('monthly-report-picker');
+            if (monthPicker && !monthPicker.value) {
+                monthPicker.value = today.slice(0, 7);
+            }
+            const selectedYm = monthPicker?.value || today.slice(0, 7);
+            const mReport = buildMonthlyReportText(selectedYm);
+            const monthlyBox = document.getElementById('monthly-health-report-box');
+            if (monthlyBox) monthlyBox.innerHTML = mReport.htmlSummary;
+
+            const pCfg = appData.petalSettings || { enabled: true, style: "sakura", size: 22, opacityPct: 34 };
+            const enabledCb = document.getElementById('petal-enabled-toggle');
+            if (enabledCb) enabledCb.checked = Boolean(pCfg.enabled);
+
+            document.querySelectorAll('.petal-style-chip').forEach(btn => {
+                btn.classList.toggle('chip-active', btn.dataset.petalStyle === pCfg.style);
+            });
+
+            const sizeRange = document.getElementById('petal-size-range');
+            const sizeLbl = document.getElementById('petal-size-label');
+            if (sizeRange) sizeRange.value = pCfg.size;
+            if (sizeLbl) sizeLbl.textContent = `${pCfg.size}px`;
+
+            const opRange = document.getElementById('petal-opacity-range');
+            const opLbl = document.getElementById('petal-opacity-label');
+            if (opRange) opRange.value = pCfg.opacityPct;
+            if (opLbl) opLbl.textContent = `${pCfg.opacityPct}%`;
+
+            const setField = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && document.activeElement !== el) el.value = val ?? "";
+            };
+            setField('set-gemini-key', appData.geminiApiKey);
+            setField('set-bf-whatsapp', appData.bfWhatsapp || "");
+            setField('set-bf-email', appData.bfEmail || "");
+            setField('note-edit-period', appData.careNotes.period);
+            setField('note-edit-pms', appData.careNotes.pms);
+            setField('note-edit-ovulation', appData.careNotes.ovulation);
+            setField('note-edit-normal', appData.careNotes.normal);
+            setField('set-user-name', appData.userName);
+            setField('set-water-goal', appData.dailyWaterGoal);
+        }
+
+        function refreshAllViews() {
+            renderDashboard();
+            renderCalendar();
+            loadLoggerForDate(selectedLogDate);
+            renderAssistantView();
+            renderInsightsAndSettings();
+        }
+
+        // Generates customizable translucent floating flowers by style, size & optical opacity
+        function initFloatingPetals() {
+            const layer = document.getElementById('petal-bg-layer');
+            if (!layer) return;
+            layer.innerHTML = "";
+
+            const cfg = appData.petalSettings || { enabled: true, style: "sakura", size: 22, opacityPct: 34 };
+            if (!cfg.enabled) return;
+
+            const styleSvgs = {
+                sakura: [
+                    `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 5C21.5 5 23.5 9.5 21.5 14C19.5 16.5 16.5 16.5 14.5 14C12.5 9.5 14.5 5 18 5Z" fill="rgba(251,113,133,0.72)"/><path d="M30.4 14C31.5 17.3 27.8 20.5 23 19.6C20 18.2 19.2 15.3 21.3 13.1C25.2 10.4 29.3 10.7 30.4 14Z" fill="rgba(244,114,182,0.68)"/><path d="M25.6 29.2C22.8 31.3 18.5 29.3 17.5 24.6C17.8 21.3 20.3 19.5 23.2 20.8C27.2 23.2 28.4 27.1 25.6 29.2Z" fill="rgba(253,164,175,0.75)"/><path d="M10.4 29.2C7.6 27.1 8.8 23.2 12.8 20.8C15.7 19.5 18.2 21.3 18.5 24.6C17.5 29.3 13.2 31.3 10.4 29.2Z" fill="rgba(244,114,182,0.65)"/><path d="M5.6 14C6.7 10.7 10.8 10.4 14.7 13.1C16.8 15.3 16 18.2 13 19.6C8.2 20.5 4.5 17.3 5.6 14Z" fill="rgba(251,113,133,0.68)"/><circle cx="18" cy="18" r="3.4" fill="rgba(251,191,36,0.8)"/></svg>`
+                ],
+                rose: [
+                    `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 4C22 4 27 9 27 15.5C27 22 22 27.5 16 28C10 27.5 5 22 5 15.5C5 9 10 4 16 4Z" fill="rgba(225,29,72,0.65)"/><path d="M16 8C19.8 8 22.8 11.2 22.8 15.4C22.8 19.6 19.8 22.8 16 23.2C12.2 22.8 9.2 19.6 9.2 15.4C9.2 11.2 12.2 8 16 8Z" fill="rgba(244,63,94,0.75)"/></svg>`
+                ],
+                lotus: [
+                    `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 4C21.5 9.5 22 15.5 18 21C14 15.5 14.5 9.5 18 4Z" fill="rgba(244,114,182,0.75)"/><path d="M8 11C13.5 12.5 16.5 16.5 16.5 22C11.5 21.5 8 17.5 8 11Z" fill="rgba(249,168,212,0.75)"/><path d="M28 11C28 17.5 24.5 21.5 19.5 22C19.5 16.5 22.5 12.5 28 11Z" fill="rgba(249,168,212,0.75)"/><path d="M5 19C10.5 19.5 14.5 22.5 16.5 27C10.5 27.5 6 24.5 5 19Z" fill="rgba(236,72,153,0.65)"/><path d="M31 19C30 24.5 25.5 27.5 19.5 27C21.5 22.5 25.5 19.5 31 19Z" fill="rgba(236,72,153,0.65)"/></svg>`
+                ],
+                blossom: [
+                    `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="7" r="5" fill="rgba(253,224,71,0.78)"/><circle cx="24.5" cy="13" r="5" fill="rgba(254,240,138,0.75)"/><circle cx="21" cy="23" r="5" fill="rgba(251,191,36,0.72)"/><circle cx="11" cy="23" r="5" fill="rgba(251,191,36,0.72)"/><circle cx="7.5" cy="13" r="5" fill="rgba(254,240,138,0.75)"/><circle cx="16" cy="16" r="4.2" fill="rgba(245,158,11,0.88)"/></svg>`
+                ]
+            };
+
+            const shapes = styleSvgs[cfg.style] || styleSvgs.sakura;
+            const isSmallScreen = window.innerWidth < 640;
+            const count = isSmallScreen ? 14 : 22;
+            const baseOpacity = Math.max(0.06, Math.min(0.85, (Number(cfg.opacityPct) || 34) / 100));
+            const baseSize = Math.max(12, Math.min(44, Number(cfg.size) || 22));
+
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'petal-item';
+                const size = Math.max(10, baseSize + Math.floor((Math.random() - 0.5) * 8));
+                const leftPct = Math.floor(Math.random() * 96);
+                const duration = 11 + Math.floor(Math.random() * 11);
+                const delay = -(Math.random() * duration);
+                const drift = (Math.random() > 0.5 ? 1 : -1) * (18 + Math.floor(Math.random() * 34));
+                const itemOpacity = Math.min(0.9, Math.max(0.05, baseOpacity * (0.85 + Math.random() * 0.3))).toFixed(2);
+
+                el.style.width = `${size}px`;
+                el.style.height = `${size}px`;
+                el.style.left = `${leftPct}%`;
+                el.style.animationDuration = `${duration}s`;
+                el.style.animationDelay = `${delay.toFixed(2)}s`;
+                el.style.setProperty('--petal-drift', `${drift}px`);
+                el.style.setProperty('--petal-opacity', itemOpacity);
+                el.innerHTML = shapes[i % shapes.length];
+
+                layer.appendChild(el);
+            }
+        }
+
+        function switchTab(targetViewId) {
+            ['view-dashboard', 'view-calendar', 'view-logger', 'view-assistant', 'view-insights', 'view-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', id !== targetViewId);
+            });
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const active = btn.dataset.target === targetViewId;
+                btn.classList.toggle('text-rose-600', active);
+                btn.classList.toggle('bg-rose-50', active);
+                btn.classList.toggle('font-bold', active);
+                btn.classList.toggle('text-slate-500', !active);
+            });
+
+            refreshAllViews();
+        }
+
+        // =========================================================================
+        // 8. SAFE EVENT BINDING & INITIALIZATION
+        // =========================================================================
+        function onSafeEvent(elementId, eventName, handler) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.addEventListener(eventName, handler);
+            }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const box = document.getElementById('pwa-direct-install-box');
+            if (box) box.classList.remove('hidden');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAppData();
+            initFloatingPetals();
+
+            const setupLastPeriodEl = document.getElementById('setup-last-period');
+            if (setupLastPeriodEl) setupLastPeriodEl.value = getTodayStr();
+
+            if (!appData.isSetupDone) {
+                showScreen('screen-setup');
+            } else {
+                lockApp();
+            }
+
+            onSafeEvent('setup-form', 'submit', (e) => {
+                e.preventDefault();
+                const nameVal = (document.getElementById('setup-name')?.value || "").trim();
+                const pinVal = (document.getElementById('setup-pin')?.value || "").trim();
+                const waVal = (document.getElementById('setup-whatsapp')?.value || "").trim();
+                const emailVal = (document.getElementById('setup-email')?.value || "").trim();
+                const lastPeriodVal = document.getElementById('setup-last-period')?.value || "";
+                const cycleLen = Number(document.getElementById('setup-cycle-len')?.value) || 28;
+                const periodLen = Number(document.getElementById('setup-period-len')?.value) || 5;
+                const waterGoal = Number(document.getElementById('setup-water-goal')?.value) || 2000;
+
+                if (!nameVal) {
+                    showToast("කරුණාකර ඔබගේ නම ඇතුළත් කරන්න", "⚠️");
+                    return;
+                }
+                if (!/^\d{4}$/.test(pinVal)) {
+                    showToast("කරුණාකර ඉලක්කම් 4ක PIN අංකයක් ඇතුළත් කරන්න", "⚠️");
+                    return;
+                }
+                if (!waVal && !emailVal) {
+                    showToast("Report යැවීමට WhatsApp අංකයක් හෝ Email ලිපිනයක් ඇතුළත් කරන්න", "⚠️");
+                    return;
+                }
+
+                appData.isSetupDone = true;
+                appData.userName = nameVal;
+                appData.pin = pinVal;
+                appData.bfWhatsapp = waVal;
+                appData.bfEmail = emailVal;
+                appData.defaultCycleLength = cycleLen;
+                appData.defaultPeriodDuration = periodLen;
+                appData.dailyWaterGoal = waterGoal;
+                if (lastPeriodVal) {
+                    appData.periodStarts = [lastPeriodVal];
+                    if (!appData.dailyLogs[lastPeriodVal]) {
+                        appData.dailyLogs[lastPeriodVal] = {
+                            isPeriod: true,
+                            flow: "සාමාන්‍යයි (Medium)",
+                            pain: 0,
+                            genSeverity: 0,
+                            moods: [],
+                            symptoms: [],
+                            genSymptoms: [],
+                            cravings: [],
+                            note: "",
+                            waterMl: getWaterForDate(lastPeriodVal)
+                        };
+                    } else {
+                        appData.dailyLogs[lastPeriodVal].isPeriod = true;
+                    }
+                }
+                saveAppData();
+                showToast("LunaCare සාර්ථකව සකසන ලදී! 🌸");
+                unlockApp();
+            });
+
+            document.querySelectorAll('.pin-key').forEach(btn => {
+                btn.addEventListener('click', () => handlePinDigit(btn.dataset.num));
+            });
+
+            onSafeEvent('pin-backspace', 'click', () => {
+                currentEnteredPin = currentEnteredPin.slice(0, -1);
+                updatePinDotsUI();
+            });
+
+            onSafeEvent('pin-reset-trigger', 'click', () => {
+                document.getElementById('pin-recovery-box')?.classList.remove('hidden');
+            });
+
+            onSafeEvent('btn-close-recovery', 'click', () => {
+                document.getElementById('pin-recovery-box')?.classList.add('hidden');
+            });
+
+            onSafeEvent('btn-emergency-pin-reset', 'click', () => {
+                appData.pin = "1234";
+                saveAppData();
+                currentEnteredPin = "";
+                updatePinDotsUI();
+                document.getElementById('pin-recovery-box')?.classList.add('hidden');
+                showToast("PIN අංකය '1234' ලෙස යළි සකසන ලදී", "🔐");
+            });
+
+            onSafeEvent('btn-lock-app', 'click', lockApp);
+            onSafeEvent('btn-toggle-theme', 'click', toggleThemeMode);
+            onSafeEvent('btn-settings-theme-toggle', 'click', toggleThemeMode);
+
+            onSafeEvent('btn-open-install-guide', 'click', () => {
+                document.getElementById('install-modal')?.classList.remove('hidden');
+            });
+
+            onSafeEvent('btn-close-install-modal', 'click', () => {
+                document.getElementById('install-modal')?.classList.add('hidden');
+            });
+
+            onSafeEvent('btn-got-it-install', 'click', () => {
+                document.getElementById('install-modal')?.classList.add('hidden');
+            });
+
+            onSafeEvent('btn-trigger-pwa-install', 'click', async () => {
+                if (!deferredInstallPrompt) return;
+                deferredInstallPrompt.prompt();
+                const choice = await deferredInstallPrompt.userChoice;
+                if (choice.outcome === 'accepted') {
+                    showToast("LunaCare Home Screen එකට එක් විය! 🎉");
+                }
+                deferredInstallPrompt = null;
+                document.getElementById('install-modal')?.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.ai-quick-chip').forEach(btn => {
+                btn.addEventListener('click', () => askAiAssistant(btn.dataset.aiPrompt));
+            });
+
+            onSafeEvent('ai-chat-form', 'submit', (e) => {
+                e.preventDefault();
+                const inputEl = document.getElementById('ai-chat-input');
+                if (!inputEl) return;
+                const val = inputEl.value;
+                inputEl.value = "";
+                askAiAssistant(val);
+            });
+
+            onSafeEvent('btn-save-gemini-key', 'click', () => {
+                const keyVal = (document.getElementById('set-gemini-key')?.value || "").trim();
+                appData.geminiApiKey = keyVal;
+                saveAppData();
+                renderAssistantView();
+                showToast(keyVal ? "Gemini AI Key සුරකින ලදී! ✨" : "Smart Care Mode සක්‍රීයයි", "🤖");
+            });
+
+            onSafeEvent('petal-enabled-toggle', 'change', (e) => {
+                appData.petalSettings.enabled = Boolean(e.target.checked);
+                saveAppData();
+                initFloatingPetals();
+            });
+
+            document.querySelectorAll('.petal-style-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    appData.petalSettings.style = btn.dataset.petalStyle || "sakura";
+                    saveAppData();
+                    renderInsightsAndSettings();
+                    initFloatingPetals();
+                });
+            });
+
+            onSafeEvent('petal-size-range', 'input', (e) => {
+                const sz = Number(e.target.value) || 22;
+                appData.petalSettings.size = sz;
+                const lbl = document.getElementById('petal-size-label');
+                if (lbl) lbl.textContent = `${sz}px`;
+                saveAppData();
+                initFloatingPetals();
+            });
+
+            onSafeEvent('petal-opacity-range', 'input', (e) => {
+                const op = Number(e.target.value) || 34;
+                appData.petalSettings.opacityPct = op;
+                const lbl = document.getElementById('petal-opacity-label');
+                if (lbl) lbl.textContent = `${op}%`;
+                saveAppData();
+                initFloatingPetals();
+            });
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.target));
+            });
+
+            onSafeEvent('btn-quick-period-start', 'click', () => {
+                const today = getTodayStr();
+                if (!appData.periodStarts.includes(today)) appData.periodStarts.push(today);
+                if (!appData.dailyLogs[today]) {
+                    appData.dailyLogs[today] = {
+                        isPeriod: true,
+                        flow: "සාමාන්‍යයි (Medium)",
+                        pain: 1,
+                        genSeverity: 0,
+                        moods: [],
+                        symptoms: [],
+                        genSymptoms: [],
+                        cravings: [],
+                        note: "",
+                        waterMl: getWaterForDate(today)
+                    };
+                } else {
+                    appData.dailyLogs[today].isPeriod = true;
+                }
+                saveAppData();
+                refreshAllViews();
+                showToast("අද දිනය ඔසප් ආරම්භක දිනය ලෙස සටහන් විය! 🩸");
+            });
+
+            onSafeEvent('btn-quick-log-today', 'click', () => {
+                selectedLogDate = getTodayStr();
+                loadLoggerForDate(selectedLogDate);
+                switchTab('view-logger');
+            });
+
+            onSafeEvent('dash-btn-whatsapp', 'click', () => sendSummaryViaWhatsApp(getTodayStr()));
+            onSafeEvent('dash-btn-email', 'click', () => sendSummaryViaEmail(getTodayStr()));
+
+            document.querySelectorAll('.water-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const delta = Number(btn.dataset.waterDelta) || 0;
+                    adjustTodayWater(delta);
+                });
+            });
+
+            document.querySelectorAll('.log-water-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const delta = Number(btn.dataset.logWater) || 0;
+                    currentLoggerWaterMl = Math.max(0, currentLoggerWaterMl + delta);
+                    const disp = document.getElementById('log-water-display');
+                    if (disp) disp.textContent = `${currentLoggerWaterMl} ml`;
+                });
+            });
+
+            document.querySelectorAll('#gen-severity-options .sev-chip').forEach(btn => {
+                btn.addEventListener('click', () => setGeneralSeveritySelection(btn.dataset.sev));
+            });
+
+            onSafeEvent('btn-share-daily-report-wa', 'click', () => sendSummaryViaWhatsApp(getTodayStr()));
+
+            onSafeEvent('monthly-report-picker', 'change', () => renderInsightsAndSettings());
+
+            onSafeEvent('btn-share-monthly-wa', 'click', () => {
+                const ym = document.getElementById('monthly-report-picker')?.value || getTodayStr().slice(0, 7);
+                const mReport = buildMonthlyReportText(ym);
+                sendRawTextViaWhatsApp(mReport.whatsappText);
+            });
+
+            onSafeEvent('cal-prev-month', 'click', () => {
+                calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+                renderCalendar();
+            });
+
+            onSafeEvent('cal-next-month', 'click', () => {
+                calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            onSafeEvent('cal-today-btn', 'click', () => {
+                calendarViewDate = new Date();
+                renderCalendar();
+            });
+
+            onSafeEvent('log-date-input', 'change', (e) => {
+                if (e.target.value) loadLoggerForDate(e.target.value);
+            });
+
+            onSafeEvent('btn-mark-cycle-start', 'click', () => {
+                const dStr = document.getElementById('log-date-input')?.value || getTodayStr();
+                if (!appData.periodStarts.includes(dStr)) appData.periodStarts.push(dStr);
+                const cb = document.getElementById('log-is-period');
+                if (cb) cb.checked = true;
+                collectAndSaveCurrentLog(true);
+                showToast(`${dStr} නව ඔසප් චක්‍රයේ ආරම්භය ලෙස සටහන් විය! 🩸`);
+            });
+
+            document.querySelectorAll('#flow-options .flow-chip').forEach(btn => {
+                btn.addEventListener('click', () => setFlowSelection(btn.dataset.flow));
+            });
+
+            document.querySelectorAll('#pain-options .pain-chip').forEach(btn => {
+                btn.addEventListener('click', () => setPainSelection(btn.dataset.pain));
+            });
+
+            document.querySelectorAll('.multi-chip').forEach(btn => {
+                btn.addEventListener('click', () => toggleMultiChipUI(btn));
+            });
+
+            onSafeEvent('btn-save-log', 'click', () => collectAndSaveCurrentLog(false));
+
+            onSafeEvent('log-btn-whatsapp', 'click', () => {
+                const savedDate = collectAndSaveCurrentLog(true);
+                sendSummaryViaWhatsApp(savedDate);
+            });
+
+            onSafeEvent('log-btn-email', 'click', () => {
+                const savedDate = collectAndSaveCurrentLog(true);
+                sendSummaryViaEmail(savedDate);
+            });
+
+            onSafeEvent('btn-save-contacts', 'click', () => {
+                const wa = (document.getElementById('set-bf-whatsapp')?.value || "").trim();
+                const em = (document.getElementById('set-bf-email')?.value || "").trim();
+                appData.bfWhatsapp = wa;
+                appData.bfEmail = em;
+                saveAppData();
+                showToast("සම්බන්ධතා විස්තර සුරකින ලදී! 💑");
+            });
+
+            onSafeEvent('btn-save-notes', 'click', () => {
+                appData.careNotes.period = (document.getElementById('note-edit-period')?.value || "").trim() || DEFAULT_CARE_NOTES.period;
+                appData.careNotes.pms = (document.getElementById('note-edit-pms')?.value || "").trim() || DEFAULT_CARE_NOTES.pms;
+                appData.careNotes.ovulation = (document.getElementById('note-edit-ovulation')?.value || "").trim() || DEFAULT_CARE_NOTES.ovulation;
+                appData.careNotes.normal = (document.getElementById('note-edit-normal')?.value || "").trim() || DEFAULT_CARE_NOTES.normal;
+                saveAppData();
+                renderDashboard();
+                showToast("Care පණිවිඩ යාවත්කාලීන විය! 💌");
+            });
+
+            onSafeEvent('btn-save-profile', 'click', () => {
+                const newName = (document.getElementById('set-user-name')?.value || "").trim();
+                const newPin = (document.getElementById('set-new-pin')?.value || "").trim();
+                const newWaterGoal = Number(document.getElementById('set-water-goal')?.value);
+
+                if (newName) appData.userName = newName;
+                if (newWaterGoal >= 500 && newWaterGoal <= 5000) appData.dailyWaterGoal = newWaterGoal;
+                if (newPin) {
+                    if (!/^\d{4}$/.test(newPin)) {
+                        showToast("PIN අංකය ඉලක්කම් 4ක් විය යුතුය!", "⚠️");
+                        return;
+                    }
+                    appData.pin = newPin;
+                    const pinInput = document.getElementById('set-new-pin');
+                    if (pinInput) pinInput.value = "";
+                }
+                saveAppData();
+                refreshAllViews();
+                showToast("සැකසුම් සාර්ථකව යාවත්කාලීන විය! 🔐");
+            });
+
+            onSafeEvent('btn-export-json', 'click', () => {
+                const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `LunaCare_Backup_${getTodayStr()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast("Backup ගොනුව Download විය! ⬇️");
+            });
+
+            function handleJsonImport(fileInput) {
+                const file = fileInput?.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const imported = JSON.parse(evt.target.result);
+                        if (imported && typeof imported === 'object') {
+                            appData = {
+                                ...appData,
+                                ...imported,
+                                isSetupDone: true,
+                                careNotes: { ...DEFAULT_CARE_NOTES, ...(imported.careNotes || {}) }
+                            };
+                            saveAppData();
+                            showToast("දත්ත සාර්ථකව ප්‍රතිස්ථාපනය විය! ✨");
+                            unlockApp();
+                        }
+                    } catch (err) {
+                        showToast("වැරදි Backup ගොනුවකි!", "❌");
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            onSafeEvent('import-json-input', 'change', (e) => handleJsonImport(e.target));
+            onSafeEvent('setup-import-file', 'change', (e) => handleJsonImport(e.target));
+        });
+    </script>
+</body>
+</html>

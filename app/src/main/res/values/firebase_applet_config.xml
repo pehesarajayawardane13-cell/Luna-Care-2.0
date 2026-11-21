@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="firestore_database_id" translatable="false">ai-studio-android-lunacare-36ec11e0-0e15-43b2-9134-14f2c15f6cf6</string>
+    <string name="recaptcha_site_key" translatable="false">6LcEpScuAAAAAHK01AwGpJrcoBkWl0h5yuRiUVNG</string>
+</resources>

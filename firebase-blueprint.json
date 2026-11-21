@@ -1,0 +1,211 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile, cycle defaults, water goal, PIN, theme, floating petal preferences, contacts, and custom care notes.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this profile"
+        },
+        "userName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "setupDone": {
+          "type": "boolean",
+          "description": "Whether initial onboarding setup has been completed"
+        },
+        "pin": {
+          "type": "string",
+          "description": "4-digit privacy lock PIN"
+        },
+        "themeMode": {
+          "type": "string",
+          "enum": ["light", "dark"],
+          "description": "App display theme mode"
+        },
+        "petalsEnabled": {
+          "type": "boolean",
+          "description": "Whether floating flower petals background is enabled"
+        },
+        "petalStyle": {
+          "type": "string",
+          "enum": ["sakura", "rose", "lotus", "blossom"],
+          "description": "Selected floating flower style"
+        },
+        "petalSize": {
+          "type": "integer",
+          "description": "Petal size in dp (12..42)"
+        },
+        "petalOpacityPct": {
+          "type": "integer",
+          "description": "Petal opacity percentage (8..80)"
+        },
+        "defaultCycleLength": {
+          "type": "integer",
+          "description": "Default menstrual cycle length in days (20..45)"
+        },
+        "defaultPeriodDuration": {
+          "type": "integer",
+          "description": "Default period duration in days (2..10)"
+        },
+        "dailyWaterGoal": {
+          "type": "integer",
+          "description": "Daily hydration goal in ml (500..5000)"
+        },
+        "periodStarts": {
+          "type": "array",
+          "description": "Recorded period start dates (YYYY-MM-DD)"
+        },
+        "bfWhatsapp": {
+          "type": "string",
+          "description": "Report receiver WhatsApp number"
+        },
+        "bfEmail": {
+          "type": "string",
+          "description": "Report receiver email address"
+        },
+        "careNotePeriod": {
+          "type": "string",
+          "description": "Custom care note for period days"
+        },
+        "careNotePms": {
+          "type": "string",
+          "description": "Custom care note for PMS days"
+        },
+        "careNoteOvulation": {
+          "type": "string",
+          "description": "Custom care note for ovulation days"
+        },
+        "careNoteNormal": {
+          "type": "string",
+          "description": "Custom care note for normal days"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())"
+        }
+      },
+      "required": [
+        "userId",
+        "userName",
+        "setupDone",
+        "pin",
+        "themeMode",
+        "petalsEnabled",
+        "petalStyle",
+        "petalSize",
+        "petalOpacityPct",
+        "defaultCycleLength",
+        "defaultPeriodDuration",
+        "dailyWaterGoal",
+        "periodStarts",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DailyLog": {
+      "title": "DailyLog",
+      "description": "Daily period, hydration (ml), pain, general symptoms, moods, cravings, and personal note for a specific date.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this log"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO local date string YYYY-MM-DD matching document ID"
+        },
+        "periodDay": {
+          "type": "boolean",
+          "description": "Whether menstrual bleeding occurred on this date"
+        },
+        "flow": {
+          "type": "string",
+          "description": "Blood flow intensity label"
+        },
+        "pain": {
+          "type": "integer",
+          "description": "Pain level 0..5"
+        },
+        "genSeverity": {
+          "type": "integer",
+          "description": "General symptom severity 0..5"
+        },
+        "waterMl": {
+          "type": "integer",
+          "description": "Daily water intake in ml (0..10000)"
+        },
+        "moods": {
+          "type": "array",
+          "description": "Selected mood labels"
+        },
+        "symptoms": {
+          "type": "array",
+          "description": "Selected cycle symptom labels"
+        },
+        "genSymptoms": {
+          "type": "array",
+          "description": "Selected general health symptom labels"
+        },
+        "cravings": {
+          "type": "array",
+          "description": "Selected food craving labels"
+        },
+        "note": {
+          "type": "string",
+          "description": "Personal daily note"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())"
+        }
+      },
+      "required": [
+        "userId",
+        "date",
+        "periodDay",
+        "flow",
+        "pain",
+        "genSeverity",
+        "waterMl",
+        "moods",
+        "symptoms",
+        "genSymptoms",
+        "cravings",
+        "note",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Per-user LunaCare profile, preferences, cycle configuration, and custom care notes."
+    },
+    "/users/{userId}/daily_logs/{dateId}": {
+      "schema": {
+        "$ref": "#/entities/DailyLog"
+      },
+      "description": "Per-user daily period, water intake, symptom, mood, craving, and note logs keyed by YYYY-MM-DD."
+    }
+  }
+}
