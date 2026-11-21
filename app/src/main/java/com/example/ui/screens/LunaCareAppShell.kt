@@ -95,12 +95,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun AppNavigation(auth: FirebaseAuth = Firebase.auth) {
     val currentUser by auth.authStateFlow()
         .collectAsStateWithLifecycle(initialValue = auth.currentUser)
     val user = currentUser
+    val scope = rememberCoroutineScope()
 
     if (user == null) {
         LunaCareTheme(darkTheme = false) {
@@ -111,7 +114,17 @@ fun AppNavigation(auth: FirebaseAuth = Firebase.auth) {
                 petalSizeDp = 22,
                 petalOpacityPct = 34
             ) {
-                AuthScreen(onAuthSuccess = {})
+                AuthScreen(
+                    onAuthSuccess = {
+                        scope.launch {
+                            try {
+                                auth.signInAnonymously().await()
+                            } catch (_: Exception) {
+                                // Anonymous sign-in enable කර නැතිනම් හෝ network ගැටලුවක් නම් මෙතැනට එයි
+                            }
+                        }
+                    }
+                )
             }
         }
     } else {
